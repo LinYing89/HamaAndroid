@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_search"
+            android:icon="@drawable/ic_lightbulb_outline_black_24dp"
+            android:title="@string/action_search" />
+        <item
+            android:id="@+id/nav_set_chain"
+            android:icon="@drawable/ic_timeline_black_24dp"
+            android:title="@string/action_set_chain" />
+        <item
+            android:id="@+id/nav_video"
+            android:icon="@drawable/ic_videocam_black_24dp"
+            android:title="@string/action_video" />
+        <item
+            android:id="@+id/nav_system_set"
+            android:icon="@drawable/ic_settings_black_24dp"
+            android:title="@string/action_set" />
+        <item
+            android:id="@+id/nav_upload"
+            android:icon="@drawable/ic_file_upload_black_24dp"
+            android:title="@string/action_upload" />
+        <item
+            android:id="@+id/nav_download"
+            android:icon="@drawable/ic_file_download_black_24dp"
+            android:title="@string/action_download" />
+        <item
+            android:id="@+id/nav_exit"
+            android:icon="@drawable/ic_highlight_off_black_24dp"
+            android:title="@string/action_exit" />
+    </group>
+
+</menu>

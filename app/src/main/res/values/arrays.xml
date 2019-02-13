@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="array_event_style">
+        <item>AND</item>
+        <item>OR</item>
+    </string-array>
+    <string-array name="array_event_symbol">
+        <item>小于</item>
+        <item>等于</item>
+        <item>大于</item>
+    </string-array>
+    <string-array name="array_event_state">
+        <item>OFF</item>
+        <item>ON</item>
+    </string-array>
+    <string-array name="array_switch_action">
+        <item>关</item>
+        <item>开</item>
+    </string-array>
+    <string-array name="array_trigger_style">
+        <item>百分比</item>
+        <item>值</item>
+    </string-array>
+
+    <string-array name="array_signal_source">
+        <item>数字</item>
+        <item>4-20mA</item>
+        <item>a-bV</item>
+        <item>开关</item>
+    </string-array>
+
+    <string-array name="array_remoter">
+        <item>电视</item>
+        <item>空调</item>
+        <item>窗帘</item>
+        <item>投影仪</item>
+        <item>升降架</item>
+        <item>投影幕布</item>
+    </string-array>
+
+
+</resources>

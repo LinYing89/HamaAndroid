@@ -1,0 +1,40 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:title="局域网">
+        <Preference
+            android:key="routeName"
+            android:title="网络名称"
+            android:summary="无"
+            android:defaultValue="无"/>
+        <EditTextPreference
+            android:defaultValue="12345678"
+            android:key="routePsd"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:summary="12345678"
+            android:title="网络密码" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="服务器">
+        <EditTextPreference
+            android:defaultValue="051801.cn"
+            android:key="serverName"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:summary="051801.cn"
+            android:title="服务器名称" />
+        <Preference
+            android:key="serverPadPort"
+            android:title="pad端口"
+            android:summary="10002"/>
+        <Preference
+            android:key="serverDevPort"
+            android:title="设备端口"
+            android:summary="10003"/>
+        <Preference
+            android:key="serverUpDownloadPort"
+            android:title="上传下载端口"
+            android:summary="10004"/>
+    </PreferenceCategory>
+</PreferenceScreen>
