@@ -1,6 +1,15 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        config {
+            keyAlias 'zhibo'
+            keyPassword 'lygzbkj007'
+            storeFile file('C:/project/androidkeystore/zhibo.jks')
+            storePassword 'lygzbkj007'
+        }
+    }
+
     compileSdkVersion 28
     defaultConfig {
         applicationId "com.bairock.hamaandroid"
@@ -9,6 +18,7 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        signingConfig signingConfigs.config
 
         ndk {
             abiFilters "armeabi-v7a", "x86", "armeabi"
@@ -18,11 +28,24 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.config
+            versionNameSuffix 'release'
+        }
+        debug {
+            minifyEnabled false
+            versionNameSuffix 'debug'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.config
         }
     }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    lintOptions {
+        abortOnError false
     }
 }
 

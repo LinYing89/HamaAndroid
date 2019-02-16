@@ -1,6 +1,7 @@
 package com.bairock.hamaandroid.communication;
 
 import android.util.Log;
+import android.widget.Toast;
 
 import com.bairock.hamaandroid.app.HamaApp;
 import com.bairock.hamaandroid.app.MainActivity;
@@ -15,6 +16,7 @@ import com.bairock.iot.intelDev.device.Device;
 import com.bairock.iot.intelDev.device.Gear;
 import com.bairock.iot.intelDev.device.IStateDev;
 import com.bairock.iot.intelDev.device.OrderHelper;
+import com.bairock.iot.intelDev.device.SetDevModelTask;
 import com.bairock.iot.intelDev.device.devcollect.DevCollect;
 import com.bairock.iot.intelDev.device.devswitch.DevSwitch;
 import com.bairock.iot.intelDev.order.DeviceOrder;
@@ -172,7 +174,16 @@ public class PadClientHandler extends ChannelInboundHandlerAdapter {
                     dev.findSuperParent().setCtrlModel(CtrlModel.REMOTE);
                     ((DevCollect)dev).getCollectProperty().setCurrentValue(Float.valueOf(orderBase.getData()));
                     break;
-
+                case TO_REMOTE_CTRL_MODEL:
+                    if (!orderBase.getData().equals("OK")) {
+                        Toast.makeText(HamaApp.HAMA_CONTEXT, "请先上传数据", Toast.LENGTH_SHORT).show();
+                    } else {
+                        if (null != SearchActivity.handler && SetDevModelTask.setting) {
+                            // 服务器收到设为远程命令返回
+                            SearchActivity.handler.obtainMessage(SearchActivity.handler.CTRL_MODEL_PROGRESS, 1).sendToTarget();
+                        }
+                    }
+                    break;
                 default:
                     break;
             }

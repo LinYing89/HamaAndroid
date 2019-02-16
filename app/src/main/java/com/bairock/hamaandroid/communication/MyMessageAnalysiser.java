@@ -1,7 +1,5 @@
 package com.bairock.hamaandroid.communication;
 
-import android.util.Log;
-
 import com.bairock.hamaandroid.database.DeviceDao;
 import com.bairock.hamaandroid.app.HamaApp;
 import com.bairock.hamaandroid.esptouch.EspTouchAddDevice;
@@ -12,6 +10,7 @@ import com.bairock.iot.intelDev.device.CtrlModel;
 import com.bairock.iot.intelDev.device.Device;
 import com.bairock.iot.intelDev.device.DeviceAssistent;
 import com.bairock.iot.intelDev.device.LinkType;
+import com.bairock.iot.intelDev.device.SetDevModelTask;
 
 /**
  *
@@ -37,13 +36,12 @@ public class MyMessageAnalysiser extends MessageAnalysiser {
         if(device.getCtrlModel() != CtrlModel.LOCAL){
             device.setCtrlModel(CtrlModel.LOCAL);
         }
-        if(null != SearchActivity.deviceModelHelper && device == SearchActivity.deviceModelHelper.getDevToSet()
-                && SearchActivity.deviceModelHelper.getCtrlModel() == CtrlModel.LOCAL){
-            if(null != SearchActivity.handler){
-                Log.e("MyMessageAnalysiser", "handler");
-                SearchActivity.handler.obtainMessage(SearchActivity.handler.CTRL_MODEL_PROGRESS, 3).sendToTarget();
-            }
-        }
+//        if (null != SearchActivity.handler && SetDevModelTask.setting
+//                && SearchActivity.setDevModelThread.deviceModelHelper != null
+//                && SearchActivity.setDevModelThread.deviceModelHelper.getDevToSet() == device
+//                && SearchActivity.setDevModelThread.deviceModelHelper.getCtrlModel() == CtrlModel.LOCAL) {
+//            SearchActivity.handler.obtainMessage(SearchActivity.handler.CTRL_MODEL_PROGRESS, 3).sendToTarget();
+//        }
     }
 
     @Override
@@ -74,7 +72,7 @@ public class MyMessageAnalysiser extends MessageAnalysiser {
             }
             //Device device = DeviceAssistent.createDeviceByCoding(codings[1]);
             Device device = HamaApp.DEV_GROUP.findDeviceWithCoding(codings[1]);
-            if(null == device || !(device instanceof Coordinator)){
+            if(!(device instanceof Coordinator)){
                 return false;
             }
 
@@ -115,13 +113,11 @@ public class MyMessageAnalysiser extends MessageAnalysiser {
 
     @Override
     public void configDeviceCtrlModel(Device device, String s) {
-        if(null != SearchActivity.deviceModelHelper){
-            if(device == SearchActivity.deviceModelHelper.getDevToSet()){
-                if(null != SearchActivity.handler){
-                    Log.e("PadClientHandler", "handler 2");
-                    SearchActivity.handler.obtainMessage(SearchActivity.handler.CTRL_MODEL_PROGRESS, 2).sendToTarget();
-                }
-            }
+        if (null != SearchActivity.handler && SetDevModelTask.setting
+                && SearchActivity.setDevModelThread.deviceModelHelper != null
+                && SearchActivity.setDevModelThread.deviceModelHelper.getDevToSet() == device
+                && SearchActivity.setDevModelThread.deviceModelHelper.getCtrlModel() == CtrlModel.LOCAL) {
+            SearchActivity.handler.obtainMessage(SearchActivity.handler.CTRL_MODEL_PROGRESS, 3).sendToTarget();
         }
     }
 

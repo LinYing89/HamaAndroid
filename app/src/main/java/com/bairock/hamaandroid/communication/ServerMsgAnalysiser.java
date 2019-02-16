@@ -25,13 +25,6 @@ public class ServerMsgAnalysiser extends MyMessageAnalysiser {
             //远程设备第一次返回询问状态
             HamaApp.sendOrder(device, device.createInitOrder(), true);
         }
-        if(null != SearchActivity.deviceModelHelper && device == SearchActivity.deviceModelHelper.getDevToSet()
-                && SearchActivity.deviceModelHelper.getCtrlModel() == CtrlModel.REMOTE){
-                if(null != SearchActivity.handler){
-                    //Log.e("PadClientHandler", "handler 2");
-                    SearchActivity.handler.obtainMessage(SearchActivity.handler.CTRL_MODEL_PROGRESS, 3).sendToTarget();
-                }
-        }
     }
 
     @Override

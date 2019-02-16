@@ -36,6 +36,7 @@ import com.bairock.iot.intelDev.device.CtrlModel;
 import com.bairock.iot.intelDev.device.DevHaveChild;
 import com.bairock.iot.intelDev.device.Device;
 import com.bairock.iot.intelDev.device.OrderHelper;
+import com.bairock.iot.intelDev.device.SetDevModelTask;
 import com.bairock.iot.intelDev.device.alarm.DevAlarm;
 import com.bairock.iot.intelDev.device.devcollect.DevCollect;
 import com.bairock.iot.intelDev.device.devcollect.DevCollectSignal;
@@ -68,8 +69,8 @@ public class SearchActivity extends AppCompatActivity {
     private RecyclerAdapterDevice adapterEleHolder;
     private ProgressDialog progressDialog;
 
-    public static DeviceModelHelper deviceModelHelper;
-    public SetDevModelTask tSendModel;
+    public static SetDevModelTask setDevModelThread;
+//    public SetDevModelTask tSendModel;
 
     private Device rootDevice;
     private List<Device> listShowDevices;
@@ -145,7 +146,7 @@ public class SearchActivity extends AppCompatActivity {
         HamaApp.DEV_GROUP.removeOnDeviceCollectionChangedListener(onDeviceCollectionChangedListener);
         RecyclerAdapterDevice.handler = null;
         adapterEleHolder = null;
-        tSendModel = null;
+        setDevModelThread = null;
     }
 
     @Override
@@ -236,12 +237,6 @@ public class SearchActivity extends AppCompatActivity {
         listShowDevices = list;
         adapterEleHolder = new RecyclerAdapterDevice(this, list);
         swipeMenuRecyclerViewDevice.setAdapter(adapterEleHolder);
-    }
-
-    private void showMessageDialog(){
-        new AlertDialog.Builder(this)
-                .setMessage("当前路由器名称与已保存路由器名称不匹配，请检查网络配置")
-                .setPositiveButton("确定",null).show();
     }
 
     private List<Device> getRootDevices(Device rootDevice){
@@ -485,8 +480,8 @@ public class SearchActivity extends AppCompatActivity {
                     break;
                 case CTRL_MODEL_PROGRESS:
                     Log.e("SearchAct", (int)msg.obj + "");
-                    if(null != theActivity.tSendModel) {
-                        theActivity.tSendModel.setProgress((int) msg.obj);
+                    if(null != setDevModelThread) {
+                        setDevModelThread.setModelProgressValue = (int) msg.obj;
                     }
                     break;
                 case DEV_ADD_CHILD:
@@ -507,14 +502,13 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     private void showSetModel(Device device){
-        deviceModelHelper = new DeviceModelHelper();
-        deviceModelHelper.setDevToSet(device);
+        CtrlModel toCtrlModel;
         if(device.getCtrlModel() == CtrlModel.REMOTE){
-            deviceModelHelper.setCtrlModel(CtrlModel.LOCAL);
+            toCtrlModel = CtrlModel.LOCAL;
         }else{
-            deviceModelHelper.setCtrlModel(CtrlModel.REMOTE);
+            toCtrlModel = CtrlModel.REMOTE;
         }
-        showSetModelWaitDialog(deviceModelHelper.getCtrlModel(), device);
+        showSetModelWaitDialog(toCtrlModel, device);
     }
 
     //显示等待进度对话框
@@ -550,130 +544,47 @@ public class SearchActivity extends AppCompatActivity {
             progressDialog.getButton(DialogInterface.BUTTON_POSITIVE)
                     .setEnabled(false);
 
-            deviceModelHelper.setOrder(order);
-            tSendModel = new SetDevModelTask(this);
-            tSendModel.execute();
+            setDevModelThread = new SetDevModelTask(HamaApp.USER.getName(), HamaApp.DEV_GROUP.getName(), device, model, Config.ins().getServerName(), Config.ins().getServerDevPort());
+            setDevModelThread.setOnProgressListener(new com.bairock.iot.intelDev.device.SetDevModelTask.OnProgressListener() {
+
+                @Override
+                public void onSendToServer(String order) {
+                    PadClient.getIns().send(order);
+                }
+
+                @Override
+                public void onResult(CtrlModel toCtrlModel, boolean result) {
+                    loadResult(toCtrlModel, result);
+                }
+            });
+            IntelDevHelper.executeThread(setDevModelThread);
         }
     }
 
-    private static class SetDevModelTask extends AsyncTask<Void, Integer, Boolean> {
-
-        WeakReference<SearchActivity> mActivity;
-        /**
-         * 设置模式进度
-         * 0:向服务器发送
-         * 1:向设备发送
-         */
-        static int setModelProgressValue = 0;
-        private int count;
-
-        private SetDevModelTask(SearchActivity activity){
-            mActivity = new WeakReference<>(activity);
-        }
-
-        void setProgress(int progress){
-            setModelProgressValue = progress;
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            try {
-                while (setModelProgressValue < 3){
-                    try {
-                        publishProgress(count * 10);
-                        //计数加1
-                        count++;
-                        if(count > 10){
-                            //设置失败
-                            deviceModelHelper = null;
-                            return false;
-                        }
-
-                        if(setModelProgressValue == 0) {
-                            //第一步 向服务器发送
-                            if(deviceModelHelper.getCtrlModel() == CtrlModel.REMOTE) {
-                                //PadClient.getIns().send(deviceModelHelper.getOrder());
-                                String oldOrder = deviceModelHelper.getOrder().substring(1, deviceModelHelper.getOrder().indexOf("#"));
-                                User user = new User();
-                                user.setName(HamaApp.USER.getName());
-                                DevGroup group = new DevGroup();
-                                group.setName(HamaApp.DEV_GROUP.getName());
-                                //HamaApp.copyDevice(device, deviceModelHelper.getDevToSet());
-                                user.addGroup(group);
-                                group.addDevice(deviceModelHelper.getDevToSet());
-                                String jsonOrder = HamaApp.getUserJson(user);
-                                PadClient.getIns().send(OrderHelper.getOrderMsg(oldOrder + ":" + jsonOrder));
-                                deviceModelHelper.getDevToSet().setDevGroup(HamaApp.DEV_GROUP);
-                            }else{
-                                String oldOrder = deviceModelHelper.getOrder().substring(1, deviceModelHelper.getOrder().indexOf("#"));
-                                oldOrder += ":u" + HamaApp.USER.getName() + ":g" + HamaApp.DEV_GROUP.getName();
-                                PadClient.getIns().send(OrderHelper.getOrderMsg(oldOrder));
-                                //PadClient.getIns().send(deviceModelHelper.getOrder());
-                            }
-                        }else if(setModelProgressValue == 1){
-                            //第二步
-                            //如果时设为远程模式，向本地发送报文，
-                            // 如果设为本地模式，不需要向本地发，只需向服务器发，收到服务器响应后等待设备本地心跳
-                            if(deviceModelHelper.getCtrlModel() == CtrlModel.REMOTE){
-                                String oldOrder = deviceModelHelper.getOrder().substring(1, deviceModelHelper.getOrder().indexOf("#"));
-                                oldOrder += ":u" + HamaApp.USER.getName() + ":g" + HamaApp.DEV_GROUP.getName();
-                                DevChannelBridgeHelper.getIns().sendDevOrder(deviceModelHelper.getDevToSet(), OrderHelper.getOrderMsg(oldOrder), true);
-                                //DevChannelBridgeHelper.getIns().sendDevOrder(deviceModelHelper.getDevToSet(), deviceModelHelper.getOrder());
-                            }
-                        }
-                        Thread.sleep(5000);
-                    }catch (Exception ex){
-                        Log.e("ElectricalCtrlFragment", ex.getMessage());
-                        return false;
-                    }
-                }
-                return true;
-            }catch (Exception e){
-                e.printStackTrace();
-                return false;
-            }
-        }
-
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-            super.onProgressUpdate(values);
-            SearchActivity theActivity = mActivity.get();
-            theActivity.progressDialog.setProgress(values[0]);
-        }
-
-        @Override
-        protected void onPostExecute(final Boolean success) {
-            SearchActivity theActivity = mActivity.get();
-            deviceModelHelper = null;
-            theActivity.progressDialog.getButton(DialogInterface.BUTTON_POSITIVE).setText("确定");
-            theActivity.progressDialog.getButton(DialogInterface.BUTTON_POSITIVE)
-                    .setEnabled(true);
+    public void loadResult(CtrlModel toCtrlModel, boolean success) {
+        runOnUiThread(() -> {
+            String str;
             if (success) {
-                if(null != theActivity.progressDialog && theActivity.progressDialog.isShowing()){
-                    theActivity.progressDialog.setProgress(100);
-                    theActivity.progressDialog.setMessage("配置成功");
-                    theActivity.progressDialog.setIcon(R.drawable.ic_check_pink_24dp);
+                if (toCtrlModel == CtrlModel.REMOTE) {
+                    str = "设置远程模式成功";
+                } else {
+                    str = "设置本地模式成功";
                 }
-            }else {
-                //设置失败
-                String errMsg;
-                if(SetDevModelTask.setModelProgressValue == 0){
-                    errMsg = "服务器无响应";
-                }else{
-                    errMsg = "设备或服务器可能无响应";
+                progressDialog.setIcon(R.drawable.ic_check_pink_24dp);
+            } else {
+                if (toCtrlModel == CtrlModel.LOCAL) {
+                    str = "设置本地模式失败";
+                } else {
+                    str = "设置远程模式失败";
                 }
-                if(null != theActivity.progressDialog && theActivity.progressDialog.isShowing()){
-                    theActivity.progressDialog.setMessage("配置失败:" + errMsg);
-                    theActivity.progressDialog.setIcon(R.drawable.ic_close_pink_24dp);
-                }
+                progressDialog.setIcon(R.drawable.ic_close_pink_24dp);
             }
-            SetDevModelTask.setModelProgressValue = 0;
-        }
+            progressDialog.setMessage(str);
+            progressDialog.getButton(DialogInterface.BUTTON_POSITIVE).setText("确定");
+            progressDialog.getButton(DialogInterface.BUTTON_POSITIVE)
+                    .setEnabled(true);
+        });
 
-        @Override
-        protected void onCancelled() {
-
-        }
     }
 
     private static class AddDeviceTask extends AsyncTask<Void, Void, Boolean> {
