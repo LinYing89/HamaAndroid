@@ -24,6 +24,7 @@ import com.bairock.iot.intelDev.communication.UdpServer;
 import com.bairock.iot.intelDev.device.CtrlModel;
 import com.bairock.iot.intelDev.device.DevStateHelper;
 import com.bairock.iot.intelDev.device.Device;
+import com.bairock.iot.intelDev.device.DeviceAssistent;
 import com.bairock.iot.intelDev.device.OrderHelper;
 import com.bairock.iot.intelDev.linkage.LinkageTab;
 import com.bairock.iot.intelDev.user.DevGroup;
@@ -225,6 +226,10 @@ public class EspTouchAddDevice {
                     publishProgress(count * 10);
                     Log.e("EsptouchAct", "DEVICE" + DEVICE);
                     count++;
+
+                    //测试设备
+//                    DEVICE = DeviceAssistent.createDeviceByCoding("B30001");
+
                 }while (DEVICE == null && CONFIGING);
                 if(null == DEVICE){
                     return false;

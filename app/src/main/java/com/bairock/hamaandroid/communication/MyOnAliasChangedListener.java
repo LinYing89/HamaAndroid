@@ -9,7 +9,7 @@ import com.bairock.iot.intelDev.device.Device;
 public class MyOnAliasChangedListener implements Device.OnAliasChangedListener{
     @Override
     public void onAliasChanged(Device p0, String p1) {
-        refreshUi(p0);
+//        refreshUi(p0);
         updateDeviceDao(p0);
     }
 

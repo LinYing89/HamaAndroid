@@ -47,6 +47,7 @@ import com.bairock.iot.intelDev.device.remoter.RemoterContainer;
 import com.bairock.iot.intelDev.user.DevGroup;
 import com.bairock.iot.intelDev.user.ErrorCodes;
 import com.bairock.iot.intelDev.user.IntelDevHelper;
+import com.bairock.iot.intelDev.user.MyHome;
 import com.bairock.iot.intelDev.user.User;
 import com.yanzhenjie.recyclerview.swipe.SwipeItemClickListener;
 import com.yanzhenjie.recyclerview.swipe.SwipeMenuBridge;
@@ -57,6 +58,7 @@ import com.yanzhenjie.recyclerview.swipe.SwipeMenuRecyclerView;
 import com.yanzhenjie.recyclerview.swipe.widget.DefaultItemDecoration;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -73,7 +75,7 @@ public class SearchActivity extends AppCompatActivity {
 //    public SetDevModelTask tSendModel;
 
     private Device rootDevice;
-    private List<Device> listShowDevices;
+    private List<Device> listShowDevices = new ArrayList<>();
     private boolean childDevAdding;
 
     @Override
@@ -142,7 +144,10 @@ public class SearchActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.e("SearchAct", "onDestroy");
+        for(Device device : listShowDevices){
+            device.removeOnNameChangedListener(onNameChangedListener);
+            device.removeOnAliasChangedListener(onAliasChangedListener);
+        }
         HamaApp.DEV_GROUP.removeOnDeviceCollectionChangedListener(onDeviceCollectionChangedListener);
         RecyclerAdapterDevice.handler = null;
         adapterEleHolder = null;
@@ -234,21 +239,47 @@ public class SearchActivity extends AppCompatActivity {
     };
 
     public void setDeviceList(List<Device> list) {
+        for(Device device : listShowDevices){
+            device.removeOnNameChangedListener(onNameChangedListener);
+            device.removeOnAliasChangedListener(onAliasChangedListener);
+        }
         listShowDevices = list;
         adapterEleHolder = new RecyclerAdapterDevice(this, list);
         swipeMenuRecyclerViewDevice.setAdapter(adapterEleHolder);
+        for(Device device : listShowDevices){
+            device.addOnNameChangedListener(onNameChangedListener);
+            device.addOnAliasChangedListener(onAliasChangedListener);
+        }
     }
+
+    private MyHome.OnNameChangedListener onNameChangedListener = new MyHome.OnNameChangedListener() {
+        @Override
+        public void onNameChanged(MyHome myHome, String s) {
+            if(null != adapterEleHolder){
+                adapterEleHolder.notifyDataSetChanged();
+            }
+        }
+    };
+
+    private Device.OnAliasChangedListener onAliasChangedListener = new Device.OnAliasChangedListener() {
+        @Override
+        public void onAliasChanged(Device device, String s) {
+            if(null != adapterEleHolder){
+                adapterEleHolder.notifyDataSetChanged();
+            }
+        }
+    };
 
     private List<Device> getRootDevices(Device rootDevice){
         if(null == rootDevice){
             return HamaApp.DEV_GROUP.getListDevice();
         }
-        Device parent = rootDevice.getParent();
+        DevHaveChild parent = rootDevice.getParent();
         this.rootDevice = parent;
         if(null == parent){
             return HamaApp.DEV_GROUP.getListDevice();
         }
-        return ((DevHaveChild)parent).getListDev();
+        return parent.getListDev();
     }
 
     private void reloadNowDevices(){

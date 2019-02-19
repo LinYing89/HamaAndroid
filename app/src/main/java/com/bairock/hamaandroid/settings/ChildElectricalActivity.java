@@ -18,12 +18,14 @@ import com.bairock.hamaandroid.R;
 import com.bairock.hamaandroid.adapter.RecyclerAdapterChildDevice;
 import com.bairock.hamaandroid.app.HamaApp;
 import com.bairock.hamaandroid.app.MainActivity;
+import com.bairock.hamaandroid.database.Config;
 import com.bairock.hamaandroid.database.DeviceDao;
 import com.bairock.iot.intelDev.device.DevHaveChild;
 import com.bairock.iot.intelDev.device.Device;
 import com.bairock.iot.intelDev.device.devcollect.DevCollect;
 import com.bairock.iot.intelDev.device.devcollect.DevCollectSignal;
 import com.bairock.iot.intelDev.user.ErrorCodes;
+import com.bairock.iot.intelDev.user.MyHome;
 import com.yanzhenjie.recyclerview.swipe.SwipeItemClickListener;
 import com.yanzhenjie.recyclerview.swipe.SwipeMenuBridge;
 import com.yanzhenjie.recyclerview.swipe.SwipeMenuCreator;
@@ -83,6 +85,10 @@ public class ChildElectricalActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        for(Device device : listShowDevices){
+            device.removeOnNameChangedListener(onNameChangedListener);
+            device.removeOnAliasChangedListener(onAliasChangedListener);
+        }
         controller = null;
         handler = null;
         RecyclerAdapterChildDevice.handler = null;
@@ -126,7 +132,30 @@ public class ChildElectricalActivity extends AppCompatActivity {
         });
         adapterEle = new RecyclerAdapterChildDevice(this, listShowDevices);
         swipeMenuRecyclerViewDevice.setAdapter(adapterEle);
+
+        for(Device device : listShowDevices){
+            device.addOnNameChangedListener(onNameChangedListener);
+            device.addOnAliasChangedListener(onAliasChangedListener);
+        }
     }
+
+    private MyHome.OnNameChangedListener onNameChangedListener = new MyHome.OnNameChangedListener() {
+        @Override
+        public void onNameChanged(MyHome myHome, String s) {
+            if(null != adapterEle){
+                adapterEle.notifyDataSetChanged();
+            }
+        }
+    };
+
+    private Device.OnAliasChangedListener onAliasChangedListener = new Device.OnAliasChangedListener() {
+        @Override
+        public void onAliasChanged(Device device, String s) {
+            if(null != adapterEle){
+                adapterEle.notifyDataSetChanged();
+            }
+        }
+    };
 
     private SwipeItemClickListener deviceSwipeItemClickListener = new SwipeItemClickListener() {
         @Override
@@ -144,7 +173,8 @@ public class ChildElectricalActivity extends AppCompatActivity {
         public void onItemClick(SwipeMenuBridge menuBridge) {
             menuBridge.closeMenu();
             int adapterPosition = menuBridge.getAdapterPosition(); // RecyclerView的Item的position。
-            Device device = controller.getListDev().get(adapterPosition);
+            Device device =listShowDevices.get(adapterPosition);
+//            Device device = controller.getListDev().get(adapterPosition);
             switch (menuBridge.getPosition()){
                 case 0:
                     showRenameDialog(device);

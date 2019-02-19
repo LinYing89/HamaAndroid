@@ -24,5 +24,15 @@
         android:negativeButtonText="@null"
         android:positiveButtonText="@null"
         android:title="设备名称显示内容" />
-
+    <PreferenceCategory
+        android:title="数据传输">
+        <Preference
+            android:key="upload"
+            android:title="@string/action_upload"
+            android:summary="上传数据将使用本地数据覆盖服务器上的数据"/>
+        <Preference
+            android:key="download"
+            android:title="@string/action_download"
+            android:summary="下载数据将使用服务器上的数据覆盖本地数据"/>
+    </PreferenceCategory>
 </PreferenceScreen>

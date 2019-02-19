@@ -135,8 +135,8 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
         strEnsure = "确定";
         strCancel = "取消";
-        versionTask = new VersionTask(this);
-        versionTask.execute((Void) null);
+//        versionTask = new VersionTask(this);
+//        versionTask.execute((Void) null);
 
         SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
@@ -210,30 +210,9 @@ public class MainActivity extends AppCompatActivity
             startActivity(new Intent(MainActivity.this, SearchActivity.class));
         } else if (id == R.id.nav_set_chain) {
             startActivity(new Intent(MainActivity.this, LinkageActivity.class));
-        } else if (id == R.id.nav_video) {
-            //startActivity(new Intent(MainActivity.this, VideoPlayActivity.class));
         } else if (id == R.id.nav_system_set) {
             startActivity(new Intent(MainActivity.this, SettingsActivity2.class));
 //            startActivity(new Intent(MainActivity.this, SettingsActivity.class));
-        } else if (id == R.id.nav_upload) {
-            //上传
-            if (IS_ADMIN) {
-                Snackbar.make(getWindow().getDecorView(), "未登录，不能上传", Snackbar.LENGTH_SHORT).show();
-                return true;
-            }
-            showProgressDialog("上传");
-            HttpUploadTask task = new HttpUploadTask(HamaApp.USER, Config.ins().getServerName());
-            task.setOnExecutedListener(this::uploadResult);
-            task.start();
-        } else if (id == R.id.nav_download) {
-            if (IS_ADMIN) {
-                Snackbar.make(getWindow().getDecorView(), "未登录，不能下载", Snackbar.LENGTH_SHORT).show();
-                return true;
-            }
-            showProgressDialog("下载");
-            HttpDownloadTask task = new HttpDownloadTask(Config.ins().getServerName(), HamaApp.USER.getName(), HamaApp.DEV_GROUP.getName());
-            task.setOnExecutedListener(this::downloadResult);
-            task.start();
         } else if (id == R.id.nav_exit) {
             new AlertDialog.Builder(MainActivity.this)
                     .setMessage("确定退出账号吗")

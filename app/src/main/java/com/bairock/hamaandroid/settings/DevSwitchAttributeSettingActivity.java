@@ -89,12 +89,8 @@ public class DevSwitchAttributeSettingActivity extends AppCompatActivity {
         btnSave.setOnClickListener(view -> {
             String alias = etxtAlisa.getText().toString();
             String name = etxtName.getText().toString();
-            if(device.getAlias().equals(alias)){
-                device.setAlias(alias);
-            }
-            if(device.getName().equals(name)){
-                device.setName(name);
-            }
+            device.setAlias(alias);
+            device.setName(name);
             Gear gear;
             switch (rgGear.getCheckedRadioButtonId()){
                 case R.id.rbGearKai :
@@ -107,10 +103,7 @@ public class DevSwitchAttributeSettingActivity extends AppCompatActivity {
                         gear = Gear.ZIDONG;
                         break;
             }
-
-            if(device.getGear() != gear){
-                device.setGear(gear);
-            }
+            device.setGear(gear);
 
             finish();
         });

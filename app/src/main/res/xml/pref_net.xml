@@ -32,9 +32,5 @@
             android:key="serverDevPort"
             android:title="设备端口"
             android:summary="10003"/>
-        <Preference
-            android:key="serverUpDownloadPort"
-            android:title="上传下载端口"
-            android:summary="10004"/>
     </PreferenceCategory>
 </PreferenceScreen>

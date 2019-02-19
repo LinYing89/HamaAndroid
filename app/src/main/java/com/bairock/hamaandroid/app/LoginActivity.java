@@ -226,6 +226,7 @@ public class LoginActivity extends AppCompatActivity {
                 //MainActivity.FIRST_LOGIN = true;
                 MainActivity.IS_ADMIN = false;
                 Config.ins().setNeedLogin(getApplicationContext(), false);
+                startActivity(new Intent(this, MainActivity.class));
             }
         });
     }

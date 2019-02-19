@@ -23,6 +23,7 @@ import com.bairock.iot.intelDev.device.DevHaveChild;
 import com.bairock.iot.intelDev.device.Device;
 import com.bairock.iot.intelDev.device.IStateDev;
 import com.bairock.iot.intelDev.user.DevGroup;
+import com.bairock.iot.intelDev.user.MyHome;
 import com.yanzhenjie.recyclerview.swipe.SwipeMenuRecyclerView;
 import com.yanzhenjie.recyclerview.swipe.touch.OnItemMoveListener;
 import com.yanzhenjie.recyclerview.swipe.touch.OnItemStateChangedListener;
@@ -122,11 +123,31 @@ public class ElectricalCtrlFragment extends Fragment {
             listIStateDev = HamaApp.DEV_GROUP.findListIStateDev(true);
             Collections.sort(listIStateDev);
             for(int i = 0; i < listIStateDev.size(); i++){
-                listIStateDev.get(i).setSortIndex(i);
+                Device device = listIStateDev.get(i);
+                device.setSortIndex(i);
+                device.addOnNameChangedListener(onNameChangedListener);
+                device.addOnAliasChangedListener(onAliasChangedListener);
             }
             setAdapter();
         }
     }
+
+    private MyHome.OnNameChangedListener onNameChangedListener = new MyHome.OnNameChangedListener() {
+        @Override
+        public void onNameChanged(MyHome myHome, String s) {
+            if(Config.ins().getDevNameShowStyle().equals("0") && null != adapterElectrical){
+                adapterElectrical.notifyDataSetChanged();
+            }
+        }
+    };
+    private Device.OnAliasChangedListener onAliasChangedListener = new Device.OnAliasChangedListener() {
+        @Override
+        public void onAliasChanged(Device device, String s) {
+            if(Config.ins().getDevNameShowStyle().equals("1") && null != adapterElectrical){
+                adapterElectrical.notifyDataSetChanged();
+            }
+        }
+    };
 
     /**
      * Item的拖拽/侧滑删除时，手指状态发生变化监听。

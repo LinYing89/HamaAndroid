@@ -46,7 +46,7 @@ public class MyOnNameChangedListener implements MyHome.OnNameChangedListener {
     @Override
     public void onNameChanged(MyHome myHome, String s) {
         if(myHome instanceof Device){
-            refreshUi((Device) myHome);
+//            refreshUi((Device) myHome);
             updateDeviceDao((Device) myHome);
         }
     }

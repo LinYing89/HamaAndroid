@@ -24,10 +24,10 @@ public class CheckServerConnect extends Thread {
                     if (!PadClient.getIns().isLinked()) {
                         PadClient.getIns().link();
                     }
-                    if (PadClient.getIns().isLinked()) {
-                        //获取port
-                        getPadPort();
-                    }
+//                    if (PadClient.getIns().isLinked()) {
+//                        //获取port
+//                        getPadPort();
+//                    }
                 }
                 sleep(10000);
             } catch (InterruptedException e) {

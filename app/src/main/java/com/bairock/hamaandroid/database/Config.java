@@ -28,7 +28,9 @@ public class Config {
     private int serverDevPort = 10003;
     private String routeName = "";
     private String routePsd = "";
+    //0名称, 1别名
     private String devShowStyle = "";
+    //0宫格, 1列表
     private String devNameShowStyle = "";
 
     private boolean ctrlRing = true;
