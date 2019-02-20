@@ -205,16 +205,16 @@ public class SearchActivity extends AppCompatActivity {
         if((viewType & 2) == 2){
             //显示模式菜单
             String model;
-            if((viewType & 1) == 1){
-                //远程模式
-                model = "设为远程";
-            }else{
-                //本地模式
-                model = "设为本地";
-            }
+//            if((viewType & 1) == 1){
+//                //远程模式
+//                model = "设为远程";
+//            }else{
+//                //本地模式
+//                model = "设为本地";
+//            }
             SwipeMenuItem modelItem = new SwipeMenuItem(this)
                     .setBackgroundColor(getResources().getColor(R.color.menu_blue))
-                    .setText(model)
+                    .setText("远程/本地切换")
                     .setTextColor(Color.WHITE)
                     .setWidth(width + 20)
                     .setHeight(height);

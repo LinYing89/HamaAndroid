@@ -17,6 +17,9 @@ import com.bairock.iot.intelDev.device.LinkType;
 import com.bairock.iot.intelDev.device.devcollect.DevCollect;
 import com.bairock.iot.intelDev.device.devcollect.DevCollectClimateContainer;
 import com.bairock.iot.intelDev.device.devswitch.SubDev;
+import com.bairock.iot.intelDev.order.DeviceOrder;
+import com.bairock.iot.intelDev.order.OrderType;
+import com.bairock.iot.intelDev.user.Util;
 
 /**
  * 设备状态改变监听器
@@ -30,6 +33,12 @@ public class MyOnStateChangedListener implements Device.OnStateChangedListener {
     @Override
     public void onStateChanged(Device device, String s) {
         refreshUi(device);
+        //本地设备才往服务器发送状态，远程设备只接收服务器状态
+        if(device.findSuperParent().getCtrlModel() == CtrlModel.LOCAL) {
+            DeviceOrder devOrder = new DeviceOrder(OrderType.STATE, device.getId(), device.getLongCoding(), s);
+            String strOrder = Util.orderBaseToString(devOrder);
+            PadClient.getIns().send(strOrder);
+        }
     }
 
     @Override
@@ -37,10 +46,6 @@ public class MyOnStateChangedListener implements Device.OnStateChangedListener {
         //Log.e(TAG, "onNormalToAbnormal " + device.getCoding());
         refreshSearchUi(device);
         HamaApp.addOfflineDevCoding(device);
-        //本地设备才往服务器发送状态，远程设备只接收服务器状态
-        if(!(device instanceof SubDev) && device.findSuperParent().getCtrlModel() == CtrlModel.LOCAL) {
-            PadClient.getIns().send(device.createAbnormalOrder());
-        }
         if(device instanceof DevCollectClimateContainer){
             RefreshCollectorValueHelper.getIns().endRefresh(device);
         }

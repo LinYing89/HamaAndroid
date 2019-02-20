@@ -9,7 +9,6 @@ import com.bairock.iot.intelDev.device.Coordinator;
 import com.bairock.iot.intelDev.device.CtrlModel;
 import com.bairock.iot.intelDev.device.Device;
 import com.bairock.iot.intelDev.device.DeviceAssistent;
-import com.bairock.iot.intelDev.device.LinkType;
 import com.bairock.iot.intelDev.device.SetDevModelTask;
 
 /**
@@ -27,8 +26,7 @@ public class MyMessageAnalysiser extends MessageAnalysiser {
 
     @Override
     public void deviceFeedback(Device device, String msg) {
-        device.setLinkType(LinkType.NET);
-		PadClient.getIns().sendIfSync("$" + msg);
+//		PadClient.getIns().sendIfSync("$" + msg);
         updateDevice(device);
     }
 
@@ -36,12 +34,12 @@ public class MyMessageAnalysiser extends MessageAnalysiser {
         if(device.getCtrlModel() != CtrlModel.LOCAL){
             device.setCtrlModel(CtrlModel.LOCAL);
         }
-//        if (null != SearchActivity.handler && SetDevModelTask.setting
-//                && SearchActivity.setDevModelThread.deviceModelHelper != null
-//                && SearchActivity.setDevModelThread.deviceModelHelper.getDevToSet() == device
-//                && SearchActivity.setDevModelThread.deviceModelHelper.getCtrlModel() == CtrlModel.LOCAL) {
-//            SearchActivity.handler.obtainMessage(SearchActivity.handler.CTRL_MODEL_PROGRESS, 3).sendToTarget();
-//        }
+        if (null != SearchActivity.handler && SetDevModelTask.setting
+                && SearchActivity.setDevModelThread.deviceModelHelper != null
+                && SearchActivity.setDevModelThread.deviceModelHelper.getDevToSet() == device
+                && SearchActivity.setDevModelThread.deviceModelHelper.getCtrlModel() == CtrlModel.LOCAL) {
+            SearchActivity.handler.obtainMessage(SearchActivity.handler.CTRL_MODEL_PROGRESS, 3).sendToTarget();
+        }
     }
 
     @Override
@@ -109,16 +107,6 @@ public class MyMessageAnalysiser extends MessageAnalysiser {
     @Override
     public void configDevice(Device device, String s) {
         addNewDevice(device);
-    }
-
-    @Override
-    public void configDeviceCtrlModel(Device device, String s) {
-        if (null != SearchActivity.handler && SetDevModelTask.setting
-                && SearchActivity.setDevModelThread.deviceModelHelper != null
-                && SearchActivity.setDevModelThread.deviceModelHelper.getDevToSet() == device
-                && SearchActivity.setDevModelThread.deviceModelHelper.getCtrlModel() == CtrlModel.LOCAL) {
-            SearchActivity.handler.obtainMessage(SearchActivity.handler.CTRL_MODEL_PROGRESS, 3).sendToTarget();
-        }
     }
 
     private void addNewDevice(Device device){

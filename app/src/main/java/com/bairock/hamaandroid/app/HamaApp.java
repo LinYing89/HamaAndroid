@@ -19,13 +19,18 @@ import com.bairock.iot.intelDev.device.DevHaveChild;
 import com.bairock.iot.intelDev.device.Device;
 import com.bairock.iot.intelDev.device.devcollect.DevCollect;
 import com.bairock.iot.intelDev.device.devswitch.SubDev;
+import com.bairock.iot.intelDev.order.DeviceOrder;
+import com.bairock.iot.intelDev.order.OrderType;
 import com.bairock.iot.intelDev.user.DevGroup;
 import com.bairock.iot.intelDev.user.User;
+import com.bairock.iot.intelDev.user.Util;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tencent.bugly.crashreport.CrashReport;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.persistence.criteria.Order;
 
 public class HamaApp extends Application {
     public static User USER;
@@ -110,38 +115,57 @@ public class HamaApp extends Application {
         }
     }
 
-    public static void sendOrder(Device device, String order, boolean immediately) {
-        switch (device.getLinkType()) {
-            case SERIAL:
-                Device rootDev = device;
-                if (device instanceof SubDev) {
-                    rootDev = device.getParent();
-                }
-                //如果最后一次通信大于5s，发送
-                //如果最后一次通信小于5s，但是设备有返回，发送
-                //如果最后一次通信小于5s，并且设备无返回，不发送
-                Log.e("HamaApp", rootDev + "," + rootDev.getCommunicationInterval() + "," + rootDev.getNoResponse());
-                if (rootDev.canSend()) {
-                    rootDev.noResponsePlus();
-                    rootDev.resetLastCommunicationTime();
-                }
+    public static void sendOrder(Device device, String order, OrderType orderType, boolean immediately) {
+        switch (device.getCtrlModel()) {
+            case UNKNOW:
+                DevChannelBridgeHelper.getIns().sendDevOrder(device, order, immediately);
+                String devOrder = createDeviceOrder(device, orderType, order);
+                PadClient.getIns().send(devOrder);
                 break;
-            case NET:
-                switch (device.getCtrlModel()) {
-                    case UNKNOW:
-                        DevChannelBridgeHelper.getIns().sendDevOrder(device, order, immediately);
-                        PadClient.getIns().send(order);
-                        break;
-                    case LOCAL:
-                        DevChannelBridgeHelper.getIns().sendDevOrder(device, order, immediately);
-                        break;
-                    case REMOTE:
-                        PadClient.getIns().send(order);
-                        break;
-                }
+            case LOCAL:
+                DevChannelBridgeHelper.getIns().sendDevOrder(device, order, immediately);
+                break;
+            case REMOTE:
+                devOrder = createDeviceOrder(device, orderType, order);
+                PadClient.getIns().send(devOrder);
                 break;
         }
     }
+
+    public static void sendOrder(Device device, String order, boolean immediately) {
+        switch (device.getCtrlModel()) {
+            case UNKNOW:
+                DevChannelBridgeHelper.getIns().sendDevOrder(device, order, immediately);
+                PadClient.getIns().send(order);
+                break;
+            case LOCAL:
+                DevChannelBridgeHelper.getIns().sendDevOrder(device, order, immediately);
+                break;
+            case REMOTE:
+                PadClient.getIns().send(order);
+                break;
+        }
+    }
+
+    private static String createDeviceOrder(Device device, OrderType orderType, String order){
+        DeviceOrder ob = new DeviceOrder();
+        ob.setOrderType(OrderType.CTRL_DEV);
+        ob.setLongCoding(device.getLongCoding());
+        ob.setData(order);
+        return Util.orderBaseToString(ob);
+    }
+
+//    public static void sendCtrlDevice(Device device, String order){
+//        sendCtrlDevice(device, order, true);
+//    }
+//
+//    public static void sendCtrlDevice(Device device, String order, boolean immediately){
+//        DeviceOrder ob = new DeviceOrder();
+//        ob.setOrderType(OrderType.CTRL_DEV);
+//        ob.setLongCoding(device.getLongCoding());
+//        ob.setData(order);
+//        sendOrder(device, Util.orderBaseToString(ob), immediately);
+//    }
 
     private static void copyChildDevices(DevHaveChild dev1, DevHaveChild dev2, boolean copyId) {
         List<Device> listNewDevice = new ArrayList<>();

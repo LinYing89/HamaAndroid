@@ -11,6 +11,9 @@ import com.bairock.iot.intelDev.device.Device;
 import com.bairock.iot.intelDev.device.Gear;
 import com.bairock.iot.intelDev.device.IStateDev;
 import com.bairock.iot.intelDev.device.OrderHelper;
+import com.bairock.iot.intelDev.order.DeviceOrder;
+import com.bairock.iot.intelDev.order.OrderType;
+import com.bairock.iot.intelDev.user.Util;
 
 /**
  * 挡位改变事件
@@ -20,10 +23,10 @@ import com.bairock.iot.intelDev.device.OrderHelper;
 public class MyOnGearChangedListener implements Device.OnGearChangedListener{
     @Override
     public void onGearChanged(Device device, Gear gear) {
-        //本地设备才往服务器发送状态，远程设备只接收服务器状态
-        if(device.findSuperParent().getCtrlModel() == CtrlModel.LOCAL) {
-            PadClient.getIns().send(OrderHelper.getOrderMsg(OrderHelper.FEEDBACK_HEAD + device.getLongCoding() + OrderHelper.SEPARATOR + "b" + device.getGear()));
-        }
+        //发往服务器, 服务器只有收到本地档位报文才会改变档位, 不回自动改变
+        DeviceOrder ob = new DeviceOrder(OrderType.GEAR, device.getId(), device.getLongCoding(), gear.toString());
+        String order = Util.orderBaseToString(ob);
+        PadClient.getIns().send(order);
         refreshUi(device);
         updateDeviceDao(device);
     }

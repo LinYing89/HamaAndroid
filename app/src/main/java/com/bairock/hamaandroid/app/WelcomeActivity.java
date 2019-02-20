@@ -43,6 +43,7 @@ import com.bairock.iot.intelDev.device.DevHaveChild;
 import com.bairock.iot.intelDev.device.DevStateHelper;
 import com.bairock.iot.intelDev.device.Device;
 import com.bairock.iot.intelDev.device.DeviceAssistent;
+import com.bairock.iot.intelDev.device.IStateDev;
 import com.bairock.iot.intelDev.device.MainCodeHelper;
 import com.bairock.iot.intelDev.device.alarm.DevAlarm;
 import com.bairock.iot.intelDev.device.devcollect.CollectProperty;
@@ -54,6 +55,7 @@ import com.bairock.iot.intelDev.linkage.LinkageHelper;
 import com.bairock.iot.intelDev.linkage.LinkageTab;
 import com.bairock.iot.intelDev.linkage.guagua.GuaguaHelper;
 import com.bairock.iot.intelDev.linkage.timing.WeekHelper;
+import com.bairock.iot.intelDev.order.OrderType;
 import com.bairock.iot.intelDev.user.DevGroup;
 import com.bairock.iot.intelDev.user.User;
 
@@ -399,7 +401,7 @@ public class WelcomeActivity extends AppCompatActivity {
             LinkageTab.getIns().SetOnOrderSendListener((device, order, ctrlModel) -> {
                 //Log.e("WelcomeAct", "OnOrderSendListener " + "order: " + order + " cm: " + ctrlModel);
                 if(null != order) {
-                    HamaApp.sendOrder(device, order, false);
+                    HamaApp.sendOrder(device, ((IStateDev)device).getTurnOnOrder(), OrderType.CTRL_DEV, true);
                 }
             });
 

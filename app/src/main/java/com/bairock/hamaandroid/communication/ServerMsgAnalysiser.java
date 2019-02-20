@@ -26,8 +26,4 @@ public class ServerMsgAnalysiser extends MyMessageAnalysiser {
             HamaApp.sendOrder(device, device.createInitOrder(), true);
         }
     }
-
-    @Override
-    public void configDeviceCtrlModel(Device device, String s) {
-    }
 }

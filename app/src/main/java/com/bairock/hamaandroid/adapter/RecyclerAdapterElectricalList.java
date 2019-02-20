@@ -25,6 +25,7 @@ import com.bairock.hamaandroid.settings.DevSwitchAttributeSettingActivity;
 import com.bairock.iot.intelDev.device.Device;
 import com.bairock.iot.intelDev.device.Gear;
 import com.bairock.iot.intelDev.device.IStateDev;
+import com.bairock.iot.intelDev.order.OrderType;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -90,7 +91,7 @@ public class RecyclerAdapterElectricalList extends RecyclerView.Adapter<Recycler
                 startAnim(view);
                 device.setGear(Gear.KAI);
                 refreshGear();
-                HamaApp.sendOrder(device, ((IStateDev)device).getTurnOnOrder(), true);
+                HamaApp.sendOrder(device, ((IStateDev)device).getTurnOnOrder(), OrderType.CTRL_DEV, true);
             });
             btnAuto.setOnClickListener(view -> {
                 startAnim(view);
@@ -101,7 +102,7 @@ public class RecyclerAdapterElectricalList extends RecyclerView.Adapter<Recycler
                 startAnim(view);
                 device.setGear(Gear.GUAN);
                 refreshGear();
-                HamaApp.sendOrder(device, ((IStateDev)device).getTurnOffOrder(), true);
+                HamaApp.sendOrder(device, ((IStateDev)device).getTurnOffOrder(), OrderType.CTRL_DEV, true);
             });
         }
 

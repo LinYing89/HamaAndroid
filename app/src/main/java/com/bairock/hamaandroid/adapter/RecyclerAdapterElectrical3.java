@@ -24,6 +24,9 @@ import com.bairock.iot.intelDev.device.Device;
 import com.bairock.iot.intelDev.device.Gear;
 import com.bairock.iot.intelDev.device.IStateDev;
 import com.bairock.iot.intelDev.device.remoter.Remoter;
+import com.bairock.iot.intelDev.order.DeviceOrder;
+import com.bairock.iot.intelDev.order.OrderType;
+import com.bairock.iot.intelDev.user.Util;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -110,19 +113,19 @@ public class RecyclerAdapterElectrical3 extends RecyclerView.Adapter<RecyclerAda
                     case ZIDONG:
                         if (device.isKaiState()) {
                             toGuanGear();
-                            HamaApp.sendOrder(device, dev.getTurnOffOrder(), true);
+                            HamaApp.sendOrder(device, dev.getTurnOffOrder(), OrderType.CTRL_DEV, true);
                         } else {
                             toKaiGear();
-                            HamaApp.sendOrder(device, dev.getTurnOnOrder(), true);
+                            HamaApp.sendOrder(device, dev.getTurnOnOrder(), OrderType.CTRL_DEV, true);
                         }
                         break;
                     case KAI:
                         toGuanGear();
-                        HamaApp.sendOrder(device, dev.getTurnOffOrder(), true);
+                        HamaApp.sendOrder(device, dev.getTurnOffOrder(), OrderType.CTRL_DEV, true);
                         break;
                     default:
                         toKaiGear();
-                        HamaApp.sendOrder(device, dev.getTurnOnOrder(), true);
+                        HamaApp.sendOrder(device, dev.getTurnOnOrder(), OrderType.CTRL_DEV, true);
                         break;
                 }
             });

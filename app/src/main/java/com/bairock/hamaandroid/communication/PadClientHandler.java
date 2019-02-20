@@ -1,24 +1,18 @@
 package com.bairock.hamaandroid.communication;
 
-import android.util.Log;
 import android.widget.Toast;
 
 import com.bairock.hamaandroid.app.HamaApp;
 import com.bairock.hamaandroid.app.MainActivity;
-import com.bairock.hamaandroid.database.Config;
-import com.bairock.hamaandroid.media.Media;
 import com.bairock.hamaandroid.settings.SearchActivity;
 import com.bairock.iot.intelDev.communication.DevChannelBridgeHelper;
-import com.bairock.iot.intelDev.device.Coordinator;
 import com.bairock.iot.intelDev.device.CtrlModel;
 import com.bairock.iot.intelDev.device.DevStateHelper;
 import com.bairock.iot.intelDev.device.Device;
 import com.bairock.iot.intelDev.device.Gear;
 import com.bairock.iot.intelDev.device.IStateDev;
-import com.bairock.iot.intelDev.device.OrderHelper;
 import com.bairock.iot.intelDev.device.SetDevModelTask;
 import com.bairock.iot.intelDev.device.devcollect.DevCollect;
-import com.bairock.iot.intelDev.device.devswitch.DevSwitch;
 import com.bairock.iot.intelDev.order.DeviceOrder;
 import com.bairock.iot.intelDev.order.OrderType;
 import com.fasterxml.jackson.core.JsonParseException;
@@ -26,9 +20,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
-import java.util.List;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -100,6 +92,11 @@ public class PadClientHandler extends ChannelInboundHandlerAdapter {
     }
 
     void send(String msg){
+//        DeviceOrder ob = new DeviceOrder();
+//        ob.setOrderType(OrderType.HEAD_USER_INFO);
+//        ob.setUsername(HamaApp.USER.getName());
+//        ob.setDevGroupName(HamaApp.DEV_GROUP.getName());
+//        String order = Util.orderBaseToString(ob);
         msg = msg + System.getProperty("line.separator");
         try {
             if(null != channel) {
@@ -113,6 +110,7 @@ public class PadClientHandler extends ChannelInboundHandlerAdapter {
     private void analysisMsg2(String strData) {
         ObjectMapper om = new ObjectMapper();
         try {
+            Device dev;
             DeviceOrder orderBase = om.readValue(strData, DeviceOrder.class);
             String order = "";
             switch(orderBase.getOrderType()) {
@@ -137,7 +135,7 @@ public class PadClientHandler extends ChannelInboundHandlerAdapter {
                     send(order);
                     break;
                 case GEAR :
-                    Device dev = HamaApp.DEV_GROUP.findDeviceWithCoding(orderBase.getLongCoding());
+                    dev = HamaApp.DEV_GROUP.findDeviceWithCoding(orderBase.getLongCoding());
                     if(null == dev){
                         return;
                     }
@@ -164,6 +162,7 @@ public class PadClientHandler extends ChannelInboundHandlerAdapter {
                     }
                     dev.findSuperParent().setCtrlModel(CtrlModel.REMOTE);
                     dev.setDevStateId(orderBase.getData());
+                    isToCtrlModelDev(dev);
                     break;
                 case VALUE:
                     dev = HamaApp.DEV_GROUP.findDeviceWithCoding(orderBase.getLongCoding());
@@ -173,6 +172,7 @@ public class PadClientHandler extends ChannelInboundHandlerAdapter {
                     dev.setDevStateId(DevStateHelper.DS_ZHENG_CHANG);
                     dev.findSuperParent().setCtrlModel(CtrlModel.REMOTE);
                     ((DevCollect)dev).getCollectProperty().setCurrentValue(Float.valueOf(orderBase.getData()));
+                    isToCtrlModelDev(dev);
                     break;
                 case TO_REMOTE_CTRL_MODEL:
                     if (!orderBase.getData().equals("OK")) {
@@ -198,5 +198,14 @@ public class PadClientHandler extends ChannelInboundHandlerAdapter {
             e.printStackTrace();
         }
 
+    }
+
+    private void isToCtrlModelDev(Device device) {
+        if (null != SearchActivity.handler && SetDevModelTask.setting
+                && SearchActivity.setDevModelThread.deviceModelHelper != null
+                && SearchActivity.setDevModelThread.deviceModelHelper.getDevToSet() == device.findSuperParent()
+                && SearchActivity.setDevModelThread.deviceModelHelper.getCtrlModel() == CtrlModel.REMOTE) {
+            SearchActivity.handler.obtainMessage(SearchActivity.handler.CTRL_MODEL_PROGRESS, 3).sendToTarget();
+        }
     }
 }

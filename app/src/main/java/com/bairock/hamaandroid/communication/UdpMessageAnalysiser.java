@@ -62,9 +62,4 @@ public class UdpMessageAnalysiser extends MessageAnalysiser {
             UdpServer.getIns().send("$" + s);
         }
     }
-
-    @Override
-    public void configDeviceCtrlModel(Device device, String s) {
-
-    }
 }
