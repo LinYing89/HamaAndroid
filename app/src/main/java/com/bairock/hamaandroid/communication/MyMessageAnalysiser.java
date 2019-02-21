@@ -25,15 +25,17 @@ public class MyMessageAnalysiser extends MessageAnalysiser {
     }
 
     @Override
-    public void deviceFeedback(Device device, String msg) {
+    public void deviceHandleBefore(Device device, String s) {
+        device.setCtrlModel(CtrlModel.LOCAL);
+    }
+
+    @Override
+    public void deviceHandleAfter(Device device, String msg) {
 //		PadClient.getIns().sendIfSync("$" + msg);
         updateDevice(device);
     }
 
     public void updateDevice(Device device){
-        if(device.getCtrlModel() != CtrlModel.LOCAL){
-            device.setCtrlModel(CtrlModel.LOCAL);
-        }
         if (null != SearchActivity.handler && SetDevModelTask.setting
                 && SearchActivity.setDevModelThread.deviceModelHelper != null
                 && SearchActivity.setDevModelThread.deviceModelHelper.getDevToSet() == device

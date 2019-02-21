@@ -83,21 +83,19 @@ public class MyOnStateChangedListener implements Device.OnStateChangedListener {
 //    }
 
     private void refreshUi(Device device){
-        synchronized (syno) {
-            if (device instanceof IStateDev) {
-                if(Config.ins().getDevShowStyle().equals("0")) {
-                    if(null != ElectricalCtrlFragment.handler){
-                        ElectricalCtrlFragment.handler.obtainMessage(ElectricalCtrlFragment.NOTIFY_ADAPTER, RecyclerAdapterElectrical3.STATE, RecyclerAdapterElectrical3.STATE, device).sendToTarget();
-                    }
-                }else{
-                    if (null != RecyclerAdapterElectricalList.handler) {
-                        RecyclerAdapterElectricalList.handler.obtainMessage(RecyclerAdapterElectricalList.STATE, device).sendToTarget();
-                    }
+        if (device instanceof IStateDev) {
+            if(Config.ins().getDevShowStyle().equals("0")) {
+                if(null != ElectricalCtrlFragment.handler){
+                    ElectricalCtrlFragment.handler.obtainMessage(ElectricalCtrlFragment.NOTIFY_ADAPTER, RecyclerAdapterElectrical3.STATE, RecyclerAdapterElectrical3.STATE, device).sendToTarget();
                 }
-            }else if(device instanceof DevCollect){
-                if(null != ClimateFragment.handler){
-                    ClimateFragment.handler.obtainMessage(ClimateFragment.NOTIFY_ADAPTER, RecyclerAdapterCollect.STATE, RecyclerAdapterCollect.STATE, device).sendToTarget();
+            }else{
+                if (null != RecyclerAdapterElectricalList.handler) {
+                    RecyclerAdapterElectricalList.handler.obtainMessage(RecyclerAdapterElectricalList.STATE, device).sendToTarget();
                 }
+            }
+        }else if(device instanceof DevCollect){
+            if(null != ClimateFragment.handler){
+                ClimateFragment.handler.obtainMessage(ClimateFragment.NOTIFY_ADAPTER, RecyclerAdapterCollect.STATE, RecyclerAdapterCollect.STATE, device).sendToTarget();
             }
         }
     }

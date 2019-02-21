@@ -401,7 +401,7 @@ public class WelcomeActivity extends AppCompatActivity {
             LinkageTab.getIns().SetOnOrderSendListener((device, order, ctrlModel) -> {
                 //Log.e("WelcomeAct", "OnOrderSendListener " + "order: " + order + " cm: " + ctrlModel);
                 if(null != order) {
-                    HamaApp.sendOrder(device, ((IStateDev)device).getTurnOnOrder(), OrderType.CTRL_DEV, true);
+                    HamaApp.sendOrder(device, order, OrderType.CTRL_DEV, true);
                 }
             });
 

@@ -23,14 +23,19 @@ public class UdpMessageAnalysiser extends MessageAnalysiser {
     }
 
     @Override
-    public boolean singleMessageStart(String msg) {
-        //如果不在添加设备，udp不处理信息
-        return EspTouchAddDevice.CONFIGING;
+    public void deviceHandleBefore(Device device, String s) {
+
     }
 
     @Override
-    public void deviceFeedback(Device device, String s) {
+    public void deviceHandleAfter(Device device, String s) {
 
+    }
+
+    @Override
+    public boolean singleMessageStart(String msg) {
+        //如果不在添加设备，udp不处理信息
+        return EspTouchAddDevice.CONFIGING;
     }
 
     @Override

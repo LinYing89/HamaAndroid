@@ -37,7 +37,6 @@ public class PadClientHandler extends ChannelInboundHandlerAdapter {
     Channel channel;
 
     boolean syncDevMsg = false;
-    private MyMessageAnalysiser myMessageAnalysiser = new ServerMsgAnalysiser();
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
