@@ -278,7 +278,15 @@ public class ElectricalCtrlFragment extends Fragment {
                     theActivity.changeLayout();
                     break;
                 case NOTIFY_ADAPTER:
-                    theActivity.adapterElectrical.handler.obtainMessage(msg.arg1, msg.obj).sendToTarget();
+                    if(Config.ins().getDevShowStyle().equals("0")) {
+                        if(null != theActivity.adapterElectrical) {
+                            theActivity.adapterElectrical.handler.obtainMessage(msg.arg1, msg.obj).sendToTarget();
+                        }
+                    }else{
+                        if(null != theActivity.adapterElectricalList) {
+                            theActivity.adapterElectricalList.handler.obtainMessage(msg.arg1, msg.obj).sendToTarget();
+                        }
+                    }
             }
         }
     }

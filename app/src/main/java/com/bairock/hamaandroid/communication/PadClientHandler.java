@@ -1,5 +1,6 @@
 package com.bairock.hamaandroid.communication;
 
+import android.util.Log;
 import android.widget.Toast;
 
 import com.bairock.hamaandroid.app.HamaApp;
@@ -107,6 +108,7 @@ public class PadClientHandler extends ChannelInboundHandlerAdapter {
     }
 
     private void analysisMsg2(String strData) {
+        Log.e("PadClientHandler", "rec: " + strData);
         ObjectMapper om = new ObjectMapper();
         try {
             Device dev;

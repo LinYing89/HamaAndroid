@@ -25,6 +25,7 @@ import com.bairock.iot.intelDev.user.DevGroup;
 import com.bairock.iot.intelDev.user.User;
 import com.bairock.iot.intelDev.user.Util;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tencent.bugly.Bugly;
 import com.tencent.bugly.crashreport.CrashReport;
 
 import java.util.ArrayList;
@@ -56,8 +57,8 @@ public class HamaApp extends Application {
     public void onCreate() {
         super.onCreate();
         //腾讯bugly, 异常上报
-        CrashReport.initCrashReport(getApplicationContext(), "d82b53cec9", true);
-
+//        CrashReport.initCrashReport(getApplicationContext(), "d82b53cec9", true);
+        Bugly.init(getApplicationContext(), "d82b53cec9", true);
         //SERVER_IP = "192.168.2.100";
         //URL_ROOT = "http://" + SERVER_IP + ":8080/hamaSer";
         //DevServer.PORT = 8000;

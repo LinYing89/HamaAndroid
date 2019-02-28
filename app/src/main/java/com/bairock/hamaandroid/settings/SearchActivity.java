@@ -129,12 +129,10 @@ public class SearchActivity extends AppCompatActivity {
                     }
                 }else {
                     EspTouchAddDevice espTouchAddDevice = new EspTouchAddDevice(this);
-//                    String ssid = espTouchAddDevice.getSsid();
-//                    if (!ssid.equals(Config.INSTANCE.getRouteName()) && !espTouchAddDevice.moniAdd) {
-//                        showMessageDialog();
-//                    } else {
-                        espTouchAddDevice.startConfig();
-//                    }
+                    boolean res = espTouchAddDevice.startConfig();
+                    if(!res){
+                        Toast.makeText(this, "网络错误", Toast.LENGTH_SHORT).show();
+                    }
                 }
                 break;
         }

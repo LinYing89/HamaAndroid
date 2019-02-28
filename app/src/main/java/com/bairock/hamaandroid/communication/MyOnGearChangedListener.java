@@ -33,14 +33,8 @@ public class MyOnGearChangedListener implements Device.OnGearChangedListener{
 
     private void refreshUi(Device device){
         if (device instanceof IStateDev) {
-            if(Config.ins().getDevShowStyle().equals("0")) {
-                if (null != ElectricalCtrlFragment.handler) {
-                    ElectricalCtrlFragment.handler.obtainMessage(ElectricalCtrlFragment.NOTIFY_ADAPTER, RecyclerAdapterElectrical3.AUTO, RecyclerAdapterElectrical3.AUTO, device).sendToTarget();
-                }
-            }else{
-                if (null != RecyclerAdapterElectricalList.handler) {
-                    RecyclerAdapterElectricalList.handler.obtainMessage(RecyclerAdapterElectricalList.AUTO, device).sendToTarget();
-                }
+            if (null != ElectricalCtrlFragment.handler) {
+                ElectricalCtrlFragment.handler.obtainMessage(ElectricalCtrlFragment.NOTIFY_ADAPTER, RecyclerAdapterElectrical3.AUTO, RecyclerAdapterElectrical3.AUTO, device).sendToTarget();
             }
         }
     }

@@ -44,7 +44,7 @@ public class RecyclerAdapterElectricalList extends RecyclerView.Adapter<Recycler
     public static int colorOn = 0;
     public static int colorGear = Color.parseColor("#1E90FF");
     public static int colorGearNot = Color.BLACK;
-    public static MyHandler handler = null;
+    public MyHandler handler = null;
 
     private LayoutInflater mInflater = null;
     private List<Device> listDevice;
@@ -53,6 +53,7 @@ public class RecyclerAdapterElectricalList extends RecyclerView.Adapter<Recycler
     public RecyclerAdapterElectricalList(Context context, List<Device> listDevice){
         mInflater = LayoutInflater.from(context);
         this.listDevice = listDevice;
+        this.context = context;
         handler = new MyHandler(this);
         colorNormal = ContextCompat.getColor(context, R.color.back_fort);
         colorOn = ContextCompat.getColor(context, R.color.state_kai);

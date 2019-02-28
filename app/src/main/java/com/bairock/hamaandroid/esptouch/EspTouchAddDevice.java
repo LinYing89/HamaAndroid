@@ -58,14 +58,15 @@ public class EspTouchAddDevice {
     }
 
     private String getSsid(){
-        String ssid = mWifiAdmin.getWifiConnectedSsid();
-        if(ssid == null){
-            ssid = "";
-        }
-        return ssid;
+        return mWifiAdmin.getWifiConnectedSsid();
     }
 
-    public void startConfig(){
+    public boolean startConfig(){
+        String ssid = getSsid();
+        if(ssid == null || ssid.isEmpty()){
+            //没连无线网
+            return false;
+        }
         CONFIGING = true;
         DEVICE = null;
         RECEIVED_OK_COUNT = 0;
@@ -84,6 +85,7 @@ public class EspTouchAddDevice {
             new EsptouchAsyncTask3(this).execute(getSsid(), apBssid, Config.ins().getRoutePsd(),
                     isSsidHiddenStr, taskResultCountStr);
         }
+        return true;
     }
 
     private static class EsptouchAsyncTask3 extends AsyncTask<String, Void, List<IEsptouchResult>> {

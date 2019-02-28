@@ -15,8 +15,8 @@ android {
         applicationId "com.bairock.hamaandroid"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "1.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         signingConfig signingConfigs.config
 
@@ -63,7 +63,8 @@ dependencies {
     implementation 'com.android.support:support-v4:28.0.0'
     implementation 'com.yanzhenjie:recyclerview-swipe:1.1.4'
     //腾讯bugly
-    implementation 'com.tencent.bugly:crashreport:latest.release' //其中latest.release指代最新Bugly SDK版本号，也可以指定明确的版本号，例如2.1.9
+//    implementation 'com.tencent.bugly:crashreport:latest.release' //其中latest.release指代最新Bugly SDK版本号，也可以指定明确的版本号，例如2.1.9
+    implementation 'com.tencent.bugly:crashreport_upgrade:latest.release'
     implementation 'com.tencent.bugly:nativecrashreport:latest.release'
 
     testImplementation 'junit:junit:4.12'

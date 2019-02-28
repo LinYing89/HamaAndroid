@@ -12,6 +12,5 @@ public class MyOnGearNeedToAutoListener implements Device.OnGearNeedToAutoListen
         if(null != ElectricalCtrlFragment.handler){
             ElectricalCtrlFragment.handler.obtainMessage(ElectricalCtrlFragment.NOTIFY_ADAPTER, RecyclerAdapterElectrical3.GEAR_NEED_TO_AUTO, RecyclerAdapterElectrical3.GEAR_NEED_TO_AUTO, device).sendToTarget();
         }
-        RecyclerAdapterElectricalList.handler.obtainMessage(RecyclerAdapterElectricalList.GEAR_NEED_TO_AUTO, device).sendToTarget();
     }
 }
