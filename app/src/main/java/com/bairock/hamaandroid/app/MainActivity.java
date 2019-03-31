@@ -11,6 +11,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
@@ -30,6 +31,7 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 
 import com.bairock.hamaandroid.R;
 import com.bairock.hamaandroid.adapter.SectionsPagerAdapter;
@@ -45,17 +47,13 @@ import com.bairock.hamaandroid.settings.SearchActivity;
 import com.bairock.hamaandroid.zview.MarqueeView;
 import com.bairock.hamaandroid.settings.SettingsActivity2;
 import com.bairock.iot.intelDev.communication.DevChannelBridgeHelper;
+import com.bairock.iot.intelDev.communication.DevServer;
 import com.bairock.iot.intelDev.data.Result;
-import com.bairock.iot.intelDev.device.Device;
-import com.bairock.iot.intelDev.http.HttpDownloadTask;
-import com.bairock.iot.intelDev.http.HttpUploadTask;
 import com.bairock.iot.intelDev.user.DevGroup;
 import com.bairock.iot.intelDev.user.IntelDevHelper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity
@@ -69,6 +67,7 @@ public class MainActivity extends AppCompatActivity
     public static final int DOWNLOAD_FAIL = 5;
     public static final int DOWNLOAD_OK = 6;
     public static final int REFRESH_TITLE = 8;
+    public static final int SHOW_LOGOUT_DIALOG = 9;
     public static MyHandler handler = null;
 
     public static final String UPDATE_ALARM_TEXT_ACTION = "com.bairock.hamadev.updateAlarm";
@@ -110,7 +109,13 @@ public class MainActivity extends AppCompatActivity
             VERSION_NAME = packageInfo.versionName;
             //subTitle += " v" + VERSION_NAME;
         }
-        title = HamaApp.USER.getName() + "-" + HamaApp.DEV_GROUP.getName() + ":" + HamaApp.DEV_GROUP.getPetName();
+        String groupName = "";
+        if(null == HamaApp.DEV_GROUP.getPetName() || HamaApp.DEV_GROUP.getPetName().isEmpty()){
+            groupName = HamaApp.DEV_GROUP.getName();
+        }else{
+            groupName = HamaApp.DEV_GROUP.getPetName();
+        }
+        title = HamaApp.USER.getName() + "-" + groupName;
         toolbar.setTitle(title);
         //toolbar.setSubtitle(subTitle);
 
@@ -245,7 +250,7 @@ public class MainActivity extends AppCompatActivity
         super.onDestroy();
         unregisterReceiver(networkConnectChangedReceiver);
         unregisterReceiver(br);
-        HamaApp.DEV_SERVER.close();
+        DevServer.getIns().close();
         CheckServerConnect.running = false;
         IntelDevHelper.shutDown();
         System.exit(0);
@@ -321,8 +326,22 @@ public class MainActivity extends AppCompatActivity
                         theActivity.toolbar.setTitle(theActivity.title);
                     }
                     break;
+                case SHOW_LOGOUT_DIALOG:
+                    theActivity.showLogoutDialog();
+                    break;
             }
         }
+    }
+
+    private void showLogoutDialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(false);
+
+        builder.setMessage("该账号已在其他设备上本地登录!")
+                .setPositiveButton("确定",
+                        (dialog, whichButton) -> {
+                            System.exit(0);
+                        }).show();
     }
 
     private void showProgressDialog(String title) {

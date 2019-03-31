@@ -70,18 +70,30 @@
                     android:inputType="textPassword" />
             </android.support.design.widget.TextInputLayout>
 
-            <Button
-                android:id="@+id/btnLogin"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginTop="8dp"
-                android:text="登录" />
+                android:orientation="horizontal">
+                <Button
+                    android:id="@+id/btnLogin"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="远程登录" />
+                <Button
+                    android:id="@+id/btnLoginLocal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="本地登录" />
+            </LinearLayout>
 
             <Button
                 android:id="@+id/btnLoginOffline"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="本地登录" />
+                android:text="离线登录" />
         </LinearLayout>
     </ScrollView>
 

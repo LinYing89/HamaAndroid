@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import com.bairock.hamaandroid.R;
 import com.bairock.hamaandroid.app.HamaApp;
+import com.bairock.hamaandroid.communication.PadClient;
 import com.bairock.hamaandroid.database.Config;
 import com.bairock.hamaandroid.media.Media;
 import com.bairock.hamaandroid.settings.DevSwitchAttributeSettingActivity;
@@ -93,17 +94,26 @@ public class RecyclerAdapterElectricalList extends RecyclerView.Adapter<Recycler
                 device.setGear(Gear.KAI);
                 refreshGear();
                 HamaApp.sendOrder(device, ((IStateDev)device).getTurnOnOrder(), OrderType.CTRL_DEV, true);
+
+                String gearOrder = HamaApp.createDeviceOrder(device, OrderType.GEAR, device.getGear().toString());
+                PadClient.getIns().send(gearOrder);
             });
             btnAuto.setOnClickListener(view -> {
                 startAnim(view);
                 device.setGear(Gear.ZIDONG);
                 refreshGear();
+
+                String gearOrder = HamaApp.createDeviceOrder(device, OrderType.GEAR, device.getGear().toString());
+                PadClient.getIns().send(gearOrder);
             });
             btnOff.setOnClickListener(view -> {
                 startAnim(view);
                 device.setGear(Gear.GUAN);
                 refreshGear();
                 HamaApp.sendOrder(device, ((IStateDev)device).getTurnOffOrder(), OrderType.CTRL_DEV, true);
+
+                String gearOrder = HamaApp.createDeviceOrder(device, OrderType.GEAR, device.getGear().toString());
+                PadClient.getIns().send(gearOrder);
             });
         }
 

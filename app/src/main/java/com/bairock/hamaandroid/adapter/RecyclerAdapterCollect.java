@@ -98,7 +98,7 @@ public class RecyclerAdapterCollect extends RecyclerView.Adapter<RecyclerAdapter
             this.device = device;
             init();
             textName.setOnClickListener(view -> {
-                DevCollectSettingActivity.devCollectSignal = (DevCollectSignal) device;
+                DevCollectSettingActivity.devCollectSignal = device;
                 context.startActivity(new Intent(context, DevCollectSettingActivity.class));
             });
         }

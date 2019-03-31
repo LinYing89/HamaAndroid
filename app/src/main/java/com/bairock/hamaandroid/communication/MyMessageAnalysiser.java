@@ -63,6 +63,7 @@ public class MyMessageAnalysiser extends MessageAnalysiser {
     @Override
     public boolean singleMessageStart(String msg) {
         if(msg.startsWith("!")){
+            //协调器添加设备
             if(msg.contains("#")){
                 msg = msg.substring(0, msg.indexOf("#"));
             }
@@ -86,7 +87,10 @@ public class MyMessageAnalysiser extends MessageAnalysiser {
                 if(null == device1){
                     device1 = DeviceAssistent.createDeviceByCoding(coding);
                     if(device1 != null){
+                        //子设备监听器在MyOnDevHaveChildeOnCollectionChangedListener中添加
                         HamaApp.DEV_GROUP.createDefaultDeviceName(device1);
+                        int sortIndex = HamaApp.DEV_GROUP.createNextSortIndex();
+                        HamaApp.DEV_GROUP.setDeviceSortIndex(device1, sortIndex);
                         coordinator.addChildDev(device1);
                         DeviceDao deviceDao = DeviceDao.get(HamaApp.HAMA_CONTEXT);
                         deviceDao.add(device1);

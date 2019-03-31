@@ -34,6 +34,8 @@ public class PadClient {
 
     private Bootstrap b;
 
+    private boolean linking;
+
     private PadClient(){
         init();
     }
@@ -77,6 +79,10 @@ public class PadClient {
     }
 
     void link(){
+        if (linking) {
+            return;
+        }
+        linking = true;
         try {
             // Start the client.
             ChannelFuture channelFuture = b.connect(Config.ins().getServerName(), Config.ins().getServerPadPort()); // (5)
@@ -89,12 +95,19 @@ public class PadClient {
                 MainActivity.handler.obtainMessage(MainActivity.REFRESH_TITLE, "(未连接)").sendToTarget();
             }
         }
+        linking = false;
     }
 
     public void closeHandler(){
         if(null != padClientHandler)
         padClientHandler.channel.close();
         padClientHandler = null;
+    }
+
+    public void sendUserInfo() {
+        if (null != padClientHandler) {
+            padClientHandler.sendUserInfo();
+        }
     }
 
     public void send(String msg){

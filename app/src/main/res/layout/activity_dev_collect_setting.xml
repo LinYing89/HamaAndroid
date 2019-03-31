@@ -141,15 +141,49 @@
 
                 </TableRow>
 
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical"
+                        android:text="标定:" />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="horizontal">
+                        <EditText
+                            android:id="@+id/etxtCalibration"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:minHeight="@dimen/dp_38"
+                            android:layout_weight="1"
+                            android:inputType="number"
+                            android:textSize="14sp" />
+                        <Button
+                            android:id="@+id/btnCalibration"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="标定"
+                            android:layout_weight="3"/>
+                    </LinearLayout>
+
+                </TableRow>
+
                 <Button
                     android:id="@+id/btnValueTrigged"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:visibility="gone"
                     android:text="值变化提醒"/>
                 <Button
                     android:id="@+id/btnValueLinkage"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:visibility="gone"
                     android:text="值变化连锁"/>
 
             </TableLayout>
@@ -233,73 +267,6 @@
                 </TableRow>
 
             </TableLayout>
-
-            <TableLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="@dimen/activity_vertical_margin"
-                android:background="@android:color/background_light"
-                android:paddingBottom="8dp"
-                android:paddingEnd="8dp"
-                android:paddingStart="8dp"
-                android:paddingTop="8dp"
-                android:visibility="gone">
-
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/formula" />
-
-                    <EditText
-                        android:id="@+id/etxtFormula"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:ems="10"
-                        android:hint="@string/value_hint"
-                        android:inputType="textPersonName"
-                        android:textSize="14sp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/collect_setting_note"
-                        android:textAlignment="center"
-                        android:textSize="@dimen/dp_10" />
-                </TableRow>
-
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/calibration" />
-
-                    <EditText
-                        android:id="@+id/etxtCalibration"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:ems="10"
-                        android:hint="@string/value_hint"
-                        android:inputType="numberDecimal"
-                        android:textSize="14sp" />
-
-                    <Button
-                        android:id="@+id/btnCalibration"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/calibration" />
-                </TableRow>
-
-            </TableLayout>
-
 
             <LinearLayout
                 style="?android:attr/buttonBarStyle"

@@ -55,6 +55,7 @@ import com.bairock.iot.intelDev.linkage.LinkageHelper;
 import com.bairock.iot.intelDev.linkage.LinkageTab;
 import com.bairock.iot.intelDev.linkage.guagua.GuaguaHelper;
 import com.bairock.iot.intelDev.linkage.timing.WeekHelper;
+import com.bairock.iot.intelDev.order.LoginModel;
 import com.bairock.iot.intelDev.order.OrderType;
 import com.bairock.iot.intelDev.user.DevGroup;
 import com.bairock.iot.intelDev.user.User;
@@ -151,7 +152,7 @@ public class WelcomeActivity extends AppCompatActivity {
         for (Device device : HamaApp.DEV_GROUP.getListDevice()){
             //刚打开软件开始寻找设备
             FindDevHelper.getIns().findDev(device.getCoding());
-            device.setDevStateId(DevStateHelper.DS_YI_CHANG);
+            device.setDevStateId(DevStateHelper.DS_UNKNOW);
             setDeviceListener(device, onStateChangedListener, onGearChangedListener, onCtrlModelChangedListener);
         }
 
@@ -387,21 +388,22 @@ public class WelcomeActivity extends AppCompatActivity {
                 }
             });
 
-            try {
-                HamaApp.DEV_SERVER = new DevServer();
-                HamaApp.DEV_SERVER.run();
-            } catch (Exception e) {
-                e.printStackTrace();
+            if(Config.ins().getLoginModel().equals(LoginModel.LOCAL)) {
+                try {
+                    DevServer.getIns().run();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                DevChannelBridge.analysiserName = MyMessageAnalysiser.class.getName();
+                DevChannelBridgeHelper.getIns().stopSeekDeviceOnLineThread();
+                DevChannelBridgeHelper.getIns().startSeekDeviceOnLineThread();
+                DevChannelBridgeHelper.getIns().setOnHeartSendListener(new ChannelBridgeHelperHeartSendListener());
             }
-            DevChannelBridge.analysiserName = MyMessageAnalysiser.class.getName();
-            DevChannelBridgeHelper.getIns().stopSeekDeviceOnLineThread();
-            DevChannelBridgeHelper.getIns().startSeekDeviceOnLineThread();
-            DevChannelBridgeHelper.getIns().setOnHeartSendListener(new ChannelBridgeHelperHeartSendListener());
 
             LinkageTab.getIns().SetOnOrderSendListener((device, order, ctrlModel) -> {
                 //Log.e("WelcomeAct", "OnOrderSendListener " + "order: " + order + " cm: " + ctrlModel);
                 if(null != order) {
-                    HamaApp.sendOrder(device, order, OrderType.CTRL_DEV, true);
+                    HamaApp.sendOrder(device, order, OrderType.CTRL_DEV, false);
                 }
             });
 

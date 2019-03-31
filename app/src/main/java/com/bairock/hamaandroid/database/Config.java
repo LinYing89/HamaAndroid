@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import com.bairock.iot.intelDev.order.LoginModel;
+
 public class Config {
     private  static Config config = new Config();
     private Config(){}
@@ -22,6 +24,7 @@ public class Config {
     public static final String keyCtrlRing = "ctrlRing";
     private static final String keyNeedLogin = "needLogin";
     private static final String keyDownloadId = "downloadId";
+    private static final String keyLoginModel = "loginModel";
 
     private String serverName = "051801.cn";
     private int serverPadPort = 10002;
@@ -35,6 +38,7 @@ public class Config {
 
     private boolean ctrlRing = true;
     private boolean needLogin = true;
+    private String loginModel;
     //var downloadId = ""
 
     private OnDevShowStyleChangedListener onDevShowStyleChangedListener = null;
@@ -122,6 +126,18 @@ public class Config {
         this.needLogin = needLogin;
     }
 
+    public String getLoginModel() {
+        return loginModel;
+    }
+
+    public void setLoginModel(Context context, String loginModel) {
+        this.loginModel = loginModel;
+        SharedPreferences shared = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = shared.edit();
+        editor.putString(keyLoginModel, loginModel);
+        editor.apply();
+    }
+
     public OnDevShowStyleChangedListener getOnDevShowStyleChangedListener() {
         return onDevShowStyleChangedListener;
     }
@@ -147,6 +163,7 @@ public class Config {
         routePsd = shared.getString(keyRoutePsd, routePsd);
         devShowStyle = shared.getString(keyDevShowStyle, "0");
         devNameShowStyle = shared.getString(keyDevNameShowStyle, "0");
+        loginModel = shared.getString(keyLoginModel, LoginModel.LOCAL);
         needLogin = shared.getBoolean(keyNeedLogin, true);
         ctrlRing = shared.getBoolean(keyCtrlRing, true);
     }

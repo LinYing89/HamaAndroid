@@ -12,8 +12,11 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.bairock.hamaandroid.R;
+import com.bairock.hamaandroid.app.HamaApp;
+import com.bairock.hamaandroid.communication.PadClient;
 import com.bairock.iot.intelDev.device.Device;
 import com.bairock.iot.intelDev.device.Gear;
+import com.bairock.iot.intelDev.order.OrderType;
 
 public class DevSwitchAttributeSettingActivity extends AppCompatActivity {
 
@@ -103,8 +106,12 @@ public class DevSwitchAttributeSettingActivity extends AppCompatActivity {
                         gear = Gear.ZIDONG;
                         break;
             }
+            Gear oldGear = device.getGear();
             device.setGear(gear);
-
+            if(oldGear != gear){
+                String gearOrder = HamaApp.createDeviceOrder(device, OrderType.GEAR, device.getGear().toString());
+                PadClient.getIns().send(gearOrder);
+            }
             finish();
         });
 

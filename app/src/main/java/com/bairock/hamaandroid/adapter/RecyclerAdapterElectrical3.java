@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.bairock.hamaandroid.app.DragRemoterActivity;
+import com.bairock.hamaandroid.communication.PadClient;
 import com.bairock.hamaandroid.database.Config;
 import com.bairock.hamaandroid.media.Media;
 import com.bairock.hamaandroid.R;
@@ -128,6 +129,9 @@ public class RecyclerAdapterElectrical3 extends RecyclerView.Adapter<RecyclerAda
                         HamaApp.sendOrder(device, dev.getTurnOnOrder(), OrderType.CTRL_DEV, true);
                         break;
                 }
+
+                String gearOrder = HamaApp.createDeviceOrder(device, OrderType.GEAR, device.getGear().toString());
+                PadClient.getIns().send(gearOrder);
             });
         }
 

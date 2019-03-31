@@ -42,6 +42,7 @@ import com.bairock.iot.intelDev.linkage.timing.MyTime;
 import com.bairock.iot.intelDev.linkage.timing.Timing;
 import com.bairock.iot.intelDev.linkage.timing.TimingHolder;
 import com.bairock.iot.intelDev.linkage.timing.ZTimer;
+import com.bairock.iot.intelDev.order.LoginModel;
 import com.bairock.iot.intelDev.user.DevGroup;
 import com.bairock.iot.intelDev.user.User;
 import java.util.Date;
@@ -53,7 +54,8 @@ public class LoginActivity extends AppCompatActivity {
     private EditText etGroupName;
     private EditText etGroupPsd;
 
-    private Button btnLogin;
+    private Button btnLoginRemote;
+    private Button btnLoginLocal;
     private Button btnLoginOffline;
 
     private ProgressDialog progressDialog;
@@ -71,7 +73,8 @@ public class LoginActivity extends AppCompatActivity {
         etUserName = findViewById(R.id.etUserName);
         etGroupName = findViewById(R.id.etGroupName);
         etGroupPsd = findViewById(R.id.etGroupPsd);
-        btnLogin = findViewById(R.id.btnLogin);
+        btnLoginRemote = findViewById(R.id.btnLogin);
+        btnLoginLocal = findViewById(R.id.btnLoginLocal);
         btnLoginOffline = findViewById(R.id.btnLoginOffline);
 
         String userName = "";
@@ -88,22 +91,31 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void setListener(){
-        btnLogin.setOnClickListener(onClickListener);
+        btnLoginRemote.setOnClickListener(onClickListener);
+        btnLoginLocal.setOnClickListener(onClickListener);
         btnLoginOffline.setOnClickListener(onClickListener);
+    }
+
+    private void login(String loginModel){
+        showProgress(true);
+        Config.ins().setLoginModel(this, loginModel);
+        String userName = etUserName.getText().toString();
+        String groupName = etGroupName.getText().toString();
+        String groupPsd = etGroupPsd.getText().toString();
+        String url = String.format("http://%s/group/client/devGroupLogin/%s/%s/%s/%s", Config.ins().getServerName(), loginModel, userName, groupName, groupPsd);
+        //开启线程登录
+        LoginTask loginTask = new LoginTask(url);
+        loginTask.setOnExecutedListener(this::loginResult);
+        loginTask.start();
     }
 
     private View.OnClickListener onClickListener = v -> {
         switch (v.getId()){
             case R.id.btnLogin:
-                showProgress(true);
-                String userName = etUserName.getText().toString();
-                String groupName = etGroupName.getText().toString();
-                String groupPsd = etGroupPsd.getText().toString();
-                String url = String.format("http://%s/group/client/devGroupLogin/%s/%s/%s", Config.ins().getServerName(), userName, groupName, groupPsd);
-                //开启线程登录
-                LoginTask loginTask = new LoginTask(url);
-                loginTask.setOnExecutedListener(this::loginResult);
-                loginTask.start();
+                login(LoginModel.REMOTE);
+                break;
+            case R.id.btnLoginLocal:
+                login(LoginModel.LOCAL);
                 break;
             case R.id.btnLoginOffline:
                 User user = new User();

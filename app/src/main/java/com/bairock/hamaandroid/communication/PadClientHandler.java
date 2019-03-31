@@ -1,13 +1,21 @@
 package com.bairock.hamaandroid.communication;
 
+import android.app.AlertDialog;
+import android.os.Build;
 import android.util.Log;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.bairock.hamaandroid.app.HamaApp;
 import com.bairock.hamaandroid.app.MainActivity;
+import com.bairock.hamaandroid.database.Config;
 import com.bairock.hamaandroid.settings.SearchActivity;
+import com.bairock.iot.intelDev.communication.DevChannelBridge;
 import com.bairock.iot.intelDev.communication.DevChannelBridgeHelper;
+import com.bairock.iot.intelDev.communication.DevServer;
+import com.bairock.iot.intelDev.communication.FindDevHelper;
 import com.bairock.iot.intelDev.device.CtrlModel;
+import com.bairock.iot.intelDev.device.DevHaveChild;
 import com.bairock.iot.intelDev.device.DevStateHelper;
 import com.bairock.iot.intelDev.device.Device;
 import com.bairock.iot.intelDev.device.Gear;
@@ -15,8 +23,12 @@ import com.bairock.iot.intelDev.device.IStateDev;
 import com.bairock.iot.intelDev.device.SetDevModelTask;
 import com.bairock.iot.intelDev.device.devcollect.DevCollect;
 import com.bairock.iot.intelDev.order.DeviceOrder;
+import com.bairock.iot.intelDev.order.LoginModel;
 import com.bairock.iot.intelDev.order.OrderType;
+import com.bairock.iot.intelDev.user.IntelDevHelper;
+import com.bairock.iot.intelDev.user.Util;
 import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -121,8 +133,14 @@ public class PadClientHandler extends ChannelInboundHandlerAdapter {
                         ob.setOrderType(OrderType.HEAD_USER_INFO);
                         ob.setUsername(HamaApp.USER.getName());
                         ob.setDevGroupName(HamaApp.DEV_GROUP.getName());
+                        ob.setData(Config.ins().getLoginModel());
                         order = om.writeValueAsString(ob);
                         send(order);
+
+                        if (Config.ins().getLoginModel().equals(LoginModel.LOCAL)) {
+                            // 发送设备状态
+                            sendInitStateToServer();
+                        }
                     }
                     break;
                 case HEAD_SYN :
@@ -141,6 +159,9 @@ public class PadClientHandler extends ChannelInboundHandlerAdapter {
                         return;
                     }
                     dev.setGear(Gear.valueOf(orderBase.getData()));
+                    if(Config.ins().getLoginModel().equals(LoginModel.LOCAL)) {
+                        send(strData);
+                    }
                     break;
                 case CTRL_DEV:
                     dev = HamaApp.DEV_GROUP.findDeviceWithCoding(orderBase.getLongCoding());
@@ -185,6 +206,26 @@ public class PadClientHandler extends ChannelInboundHandlerAdapter {
                         }
                     }
                     break;
+                case LOGOUT:
+                    //登出
+                    CheckServerConnect.running = false;
+                    IntelDevHelper.shutDown();
+                    DevServer.getIns().close();
+                    //关闭服务器连接
+                    channel.close();
+
+                    //关闭本地服务器
+                    for (DevChannelBridge db : DevChannelBridgeHelper.getIns().getListDevChannelBridge()) {
+                        db.close();
+                    }
+
+                    //停止寻找设备
+                    FindDevHelper.getIns().enable = false;
+                    Config.ins().setNeedLogin(HamaApp.HAMA_CONTEXT, true);
+                    if(null != MainActivity.handler){
+                        MainActivity.handler.obtainMessage(MainActivity.SHOW_LOGOUT_DIALOG).sendToTarget();
+                    }
+                    break;
                 default:
                     break;
             }
@@ -201,12 +242,64 @@ public class PadClientHandler extends ChannelInboundHandlerAdapter {
 
     }
 
+    public void sendUserInfo() {
+        if (null != HamaApp.USER) {
+            DeviceOrder ob = new DeviceOrder();
+            ob.setOrderType(OrderType.HEAD_USER_INFO);
+            ob.setUsername(HamaApp.USER.getName());
+            ob.setDevGroupName(HamaApp.DEV_GROUP.getName());
+            ObjectMapper om = new ObjectMapper();
+            String order;
+            try {
+                order = om.writeValueAsString(ob);
+                send(order);
+            } catch (JsonProcessingException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+    }
+
     private void isToCtrlModelDev(Device device) {
         if (null != SearchActivity.handler && SetDevModelTask.setting
                 && SearchActivity.setDevModelThread.deviceModelHelper != null
                 && SearchActivity.setDevModelThread.deviceModelHelper.getDevToSet() == device.findSuperParent()
                 && SearchActivity.setDevModelThread.deviceModelHelper.getCtrlModel() == CtrlModel.REMOTE) {
             SearchActivity.handler.obtainMessage(SearchActivity.handler.CTRL_MODEL_PROGRESS, 3).sendToTarget();
+        }
+    }
+
+    private void sendInitStateToServer() {
+        for (Device d : HamaApp.DEV_GROUP.getListDevice()) {
+            sendInitStateToServer(d);
+        }
+    }
+
+    // 发送设备状态到服务器
+    private void sendInitStateToServer(Device dev) {
+        if (null != dev && dev.isNormal() && dev.isVisibility()) {
+            // 从缓存中读取对象, 保存状态一致
+            DeviceOrder devOrder;
+            if (dev instanceof DevCollect) {
+                devOrder = new DeviceOrder(OrderType.VALUE, dev.getId(), dev.getLongCoding(),
+                        String.valueOf(((DevCollect) dev).getCollectProperty().getCurrentValue()));
+            } else {
+                devOrder = new DeviceOrder(OrderType.STATE, dev.getId(), dev.getLongCoding(), dev.getDevStateId());
+                if (dev instanceof IStateDev) {
+                    // 发送档位
+                    DeviceOrder devo = new DeviceOrder(OrderType.GEAR, dev.getId(), dev.getLongCoding(),
+                            dev.getGear().toString());
+                    String strOrder = Util.orderBaseToString(devo);
+                    send(strOrder);
+                }
+            }
+            String strOrder = Util.orderBaseToString(devOrder);
+            send(strOrder);
+            if (dev instanceof DevHaveChild) {
+                for (Device d : ((DevHaveChild) dev).getListDev()) {
+                    sendInitStateToServer(d);
+                }
+            }
         }
     }
 }

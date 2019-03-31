@@ -174,6 +174,7 @@ public class SettingsActivity2 extends AppCompatPreferenceActivity{
                 ClimateFragment.handler.obtainMessage(ClimateFragment.REFRESH_DEVICE).sendToTarget();
             }
             showToase("下载成功");
+            PadClient.getIns().sendUserInfo();
         }
 
         private void uploadResult(Result<Object> loginResult) {

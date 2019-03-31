@@ -1,5 +1,6 @@
 package com.bairock.hamaandroid.settings;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -12,6 +13,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bairock.hamaandroid.R;
 import com.bairock.hamaandroid.database.CollectPropertyDao;
@@ -21,11 +23,12 @@ import com.bairock.hamaandroid.settings.ValueTriggerListActivity;
 import com.bairock.iot.intelDev.communication.DevChannelBridgeHelper;
 import com.bairock.iot.intelDev.device.devcollect.CollectProperty;
 import com.bairock.iot.intelDev.device.devcollect.CollectSignalSource;
+import com.bairock.iot.intelDev.device.devcollect.DevCollect;
 import com.bairock.iot.intelDev.device.devcollect.DevCollectSignal;
 
 public class DevCollectSettingActivity extends AppCompatActivity {
 
-    public static DevCollectSignal devCollectSignal;
+    public static DevCollect devCollectSignal;
     private CollectProperty collectProperty;
 
     private TextView txtCoding;
@@ -39,13 +42,15 @@ public class DevCollectSettingActivity extends AppCompatActivity {
     private TableRow tabrow_a_b;
     private EditText etxta;
     private EditText etxtb;
-    private EditText etxtFormula;
     private EditText etxtCalibration;
     private Button btnCalibration;
     private Button btnValueTrigged;
     private Button btnValueLinkage;
     private Button btnSave;
     private Button btnCancel;
+
+    private ProgressDialog waitingDialog;
+    private CalibrationThread calibrationThread;
 
     private String strFour;
     private String strTwenty;
@@ -87,6 +92,7 @@ public class DevCollectSettingActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        devCollectSignal.setCalibrationnListener(null);
     }
 
     private void findViews(){
@@ -98,7 +104,6 @@ public class DevCollectSettingActivity extends AppCompatActivity {
         etxtAb = findViewById(R.id.etxtAb);
         etxta = findViewById(R.id.etxta);
         etxtb = findViewById(R.id.etxtb);
-        etxtFormula = findViewById(R.id.etxtFormula);
         etxtCalibration = findViewById(R.id.etxtCalibration);
         spinnerSignalSource = findViewById(R.id.spinnerSignalSource);
         btnCalibration = findViewById(R.id.btnCalibration);
@@ -130,7 +135,6 @@ public class DevCollectSettingActivity extends AppCompatActivity {
         etxta.setText(String.valueOf(collectProperty.getLeastValue()));
         etxtb.setText(String.valueOf(collectProperty.getCrestValue()));
         etxtCalibration.setText(String.valueOf(collectProperty.getCalibrationValue()));
-        etxtFormula.setText(collectProperty.getFormula());
         spinnerSignalSource.setSelection(collectProperty.getCollectSrc().ordinal());
 
         initSourceLayout(collectProperty.getCollectSrc().ordinal());
@@ -188,12 +192,6 @@ public class DevCollectSettingActivity extends AppCompatActivity {
         try {
             b = Float.parseFloat(etxtb.getText().toString());
         }catch (Exception e){e.printStackTrace();}
-        String formula = etxtFormula.getText().toString();
-        float calibration = 0;
-        try {
-            calibration = Float.parseFloat(etxtCalibration.getText().toString());
-        }catch (Exception e){e.printStackTrace();}
-
         int collectSrc = spinnerSignalSource.getSelectedItemPosition();
         if(collectProperty.getCollectSrc().ordinal() != spinnerSignalSource.getSelectedItemPosition()){
             updatePropety = true;
@@ -219,14 +217,6 @@ public class DevCollectSettingActivity extends AppCompatActivity {
         if(b != collectProperty.getCrestValue()){
             updatePropety = true;
             collectProperty.setCrestValue(b);
-        }
-        if(!formula.equals(collectProperty.getFormula())){
-            updatePropety = true;
-            collectProperty.setFormula(formula);
-        }
-        if(calibration != collectProperty.getCalibrationValue()){
-            updatePropety = true;
-            collectProperty.setCalibrationValue(calibration);
         }
 
         if(updateDev){
@@ -258,16 +248,48 @@ public class DevCollectSettingActivity extends AppCompatActivity {
         }
     };
 
+    private void showCalibrationDialog(){
+        waitingDialog = new ProgressDialog(this);
+        waitingDialog.setTitle("请稍等");
+        waitingDialog.setMessage("设置标定中...");
+        waitingDialog.setIndeterminate(true);
+        waitingDialog.setCancelable(false);
+        waitingDialog.show();
+    }
+
     private View.OnClickListener onClickListener = v -> {
         switch (v.getId()){
             case R.id.btnCalibration:
                 String value = etxtCalibration.getText().toString();
                 if(value.isEmpty()){
                     Snackbar.make(btnCalibration, "标定值不可为空!", Snackbar.LENGTH_SHORT).show();
+                    return;
                 }
                 try{
                     float fValue = Float.parseFloat(value);
-                    String order = devCollectSignal.createCalibrationOrder(fValue);
+                    if(fValue < 0 || fValue > 10){
+                        Toast.makeText(this, "标定值范围为0-10", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    devCollectSignal.setCalibrationnListener(res ->{
+                        runOnUiThread(() ->{
+                            Toast.makeText(this, "标定成功", Toast.LENGTH_SHORT).show();
+                            if(null != waitingDialog){
+                                waitingDialog.dismiss();
+                            }
+                        });
+
+                        if(null != calibrationThread){
+                            calibrationThread.interrupt();
+                        }
+                        devCollectSignal.getCollectProperty().setCalibrationValue(fValue);
+                        CollectPropertyDao collectPropertyDao = CollectPropertyDao.get(this);
+                        collectPropertyDao.update(collectProperty);
+                    });
+                    showCalibrationDialog();
+                    calibrationThread = new CalibrationThread();
+                    calibrationThread.start();
+                    String order = devCollectSignal.createCalibrationOrder((int)fValue);
                     DevChannelBridgeHelper.getIns().sendDevOrder(devCollectSignal, order, true);
                 }catch (Exception e){
                     Snackbar.make(btnCalibration, "标定值包含非法字符!", Snackbar.LENGTH_SHORT).show();
@@ -290,4 +312,22 @@ public class DevCollectSettingActivity extends AppCompatActivity {
                 break;
         }
     };
+
+    private class CalibrationThread extends Thread{
+        @Override
+        public void run() {
+            try {
+                Thread.sleep(10000);
+                runOnUiThread(() ->{
+                    Toast.makeText(DevCollectSettingActivity.this, "标定超时", Toast.LENGTH_SHORT).show();
+                    if(null != waitingDialog){
+                        waitingDialog.dismiss();
+                    }
+                    devCollectSignal.setCalibrationnListener(null);
+                });
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }

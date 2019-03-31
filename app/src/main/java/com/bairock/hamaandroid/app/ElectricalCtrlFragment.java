@@ -225,7 +225,7 @@ public class ElectricalCtrlFragment extends Fragment {
 
     private void addDev(Device device){
         if(device instanceof IStateDev && device.isVisibility()){
-            device.setSortIndex(listIStateDev.size());
+//            device.setSortIndex(listIStateDev.size());
             listIStateDev.add(device);
             handler.obtainMessage(REFRESH_ELE_STATE).sendToTarget();
         }else if(device instanceof DevHaveChild){

@@ -36,7 +36,6 @@ import javax.persistence.criteria.Order;
 public class HamaApp extends Application {
     public static User USER;
     public static DevGroup DEV_GROUP;
-    public static DevServer DEV_SERVER;
 
     @SuppressLint("StaticFieldLeak")
     public static Context HAMA_CONTEXT;
@@ -148,9 +147,9 @@ public class HamaApp extends Application {
         }
     }
 
-    private static String createDeviceOrder(Device device, OrderType orderType, String order){
+    public static String createDeviceOrder(Device device, OrderType orderType, String order){
         DeviceOrder ob = new DeviceOrder();
-        ob.setOrderType(OrderType.CTRL_DEV);
+        ob.setOrderType(orderType);
         ob.setLongCoding(device.getLongCoding());
         ob.setData(order);
         return Util.orderBaseToString(ob);
