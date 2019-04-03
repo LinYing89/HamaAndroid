@@ -35,8 +35,10 @@ import android.view.WindowManager;
 
 import com.bairock.hamaandroid.R;
 import com.bairock.hamaandroid.adapter.SectionsPagerAdapter;
+import com.bairock.hamaandroid.communication.ChannelBridgeHelperHeartSendListener;
 import com.bairock.hamaandroid.communication.CheckServerConnect;
 import com.bairock.hamaandroid.communication.MyHttpRequest;
+import com.bairock.hamaandroid.communication.MyMessageAnalysiser;
 import com.bairock.hamaandroid.database.Config;
 import com.bairock.hamaandroid.database.SdDbHelper;
 import com.bairock.hamaandroid.linkage.LinkageActivity;
@@ -46,9 +48,16 @@ import com.bairock.hamaandroid.settings.BridgesStateActivity;
 import com.bairock.hamaandroid.settings.SearchActivity;
 import com.bairock.hamaandroid.zview.MarqueeView;
 import com.bairock.hamaandroid.settings.SettingsActivity2;
+import com.bairock.iot.intelDev.communication.DevChannelBridge;
 import com.bairock.iot.intelDev.communication.DevChannelBridgeHelper;
 import com.bairock.iot.intelDev.communication.DevServer;
+import com.bairock.iot.intelDev.communication.UdpServer;
 import com.bairock.iot.intelDev.data.Result;
+import com.bairock.iot.intelDev.linkage.LinkageHelper;
+import com.bairock.iot.intelDev.linkage.LinkageTab;
+import com.bairock.iot.intelDev.linkage.guagua.GuaguaHelper;
+import com.bairock.iot.intelDev.order.LoginModel;
+import com.bairock.iot.intelDev.order.OrderType;
 import com.bairock.iot.intelDev.user.DevGroup;
 import com.bairock.iot.intelDev.user.IntelDevHelper;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -101,6 +110,16 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if(null == Config.ins().getLoginModel() || Config.ins().getLoginModel().isEmpty()){
+            new AlertDialog.Builder(MainActivity.this)
+                    .setMessage("登录过期, 请重新登录.")
+                    .setPositiveButton(strEnsure,
+                            (dialog, whichButton) -> {
+                                Config.ins().setNeedLogin(MainActivity.this, true);
+                                finish();
+                            }).show();
+        }
         toolbar = findViewById(R.id.toolbar);
         //toolbar.setLogo(R.mipmap.ic_logo_white);
         packageInfo = getAppVersionCode(this);
@@ -172,6 +191,8 @@ public class MainActivity extends AppCompatActivity
             CheckServerConnect.running = true;
             IntelDevHelper.executeThread(new CheckServerConnect());
         }
+
+        initLocalConfig();
     }
 
     @Override
@@ -466,6 +487,34 @@ public class MainActivity extends AppCompatActivity
             Config.ins().setDownloadId(this, refernece);
         } catch (IllegalArgumentException ex) {
             Snackbar.make(toolbar, "下载器没有启用", Snackbar.LENGTH_LONG).show();
+        }
+    }
+
+    private void initLocalConfig() {
+        if(null != Config.ins().getLoginModel() && Config.ins().getLoginModel().equals(LoginModel.LOCAL)) {
+            try {
+                UdpServer.getIns().run();
+                DevServer.getIns().run();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            DevChannelBridge.analysiserName = MyMessageAnalysiser.class.getName();
+            DevChannelBridgeHelper.getIns().stopSeekDeviceOnLineThread();
+            DevChannelBridgeHelper.getIns().startSeekDeviceOnLineThread();
+            DevChannelBridgeHelper.getIns().setOnHeartSendListener(new ChannelBridgeHelperHeartSendListener());
+
+            LinkageTab.getIns().SetOnOrderSendListener((device, order, ctrlModel) -> {
+                //Log.e("WelcomeAct", "OnOrderSendListener " + "order: " + order + " cm: " + ctrlModel);
+                if(null != order && null != Config.ins().getLoginModel() && Config.ins().getLoginModel().equals(LoginModel.LOCAL)) {
+                    HamaApp.sendOrder(device, order, OrderType.CTRL_DEV, false);
+                }
+            });
+
+            LinkageHelper.getIns().stopCheckLinkageThread();
+            LinkageHelper.getIns().startCheckLinkageThread();
+            GuaguaHelper.getIns().stopCheckGuaguaThread();
+            GuaguaHelper.getIns().startCheckGuaguaThread();
+            GuaguaHelper.getIns().setOnOrderSendListener((guagua, s, ctrlModel) -> HamaApp.sendOrder(guagua.findSuperParent(), s, true));
         }
     }
 }

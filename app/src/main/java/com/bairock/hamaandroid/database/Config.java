@@ -163,7 +163,7 @@ public class Config {
         routePsd = shared.getString(keyRoutePsd, routePsd);
         devShowStyle = shared.getString(keyDevShowStyle, "0");
         devNameShowStyle = shared.getString(keyDevNameShowStyle, "0");
-        loginModel = shared.getString(keyLoginModel, LoginModel.LOCAL);
+        loginModel = shared.getString(keyLoginModel, "");
         needLogin = shared.getBoolean(keyNeedLogin, true);
         ctrlRing = shared.getBoolean(keyCtrlRing, true);
     }

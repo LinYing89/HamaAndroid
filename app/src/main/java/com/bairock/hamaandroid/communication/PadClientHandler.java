@@ -159,6 +159,7 @@ public class PadClientHandler extends ChannelInboundHandlerAdapter {
                         return;
                     }
                     dev.setGear(Gear.valueOf(orderBase.getData()));
+                    //远程登录发送档位时, 如果本地有客户端, 则本客户端会收到档位反馈
                     if(Config.ins().getLoginModel().equals(LoginModel.LOCAL)) {
                         send(strData);
                     }
@@ -182,7 +183,12 @@ public class PadClientHandler extends ChannelInboundHandlerAdapter {
                     if(null == dev){
                         return;
                     }
-                    dev.findSuperParent().setCtrlModel(CtrlModel.REMOTE);
+                    Device devParent = dev.findSuperParent();
+
+                    if(!devParent.isNormal()){
+                        devParent.setDevStateId(DevStateHelper.DS_ZHENG_CHANG);
+                    }
+                    devParent.setCtrlModel(CtrlModel.REMOTE);
                     dev.setDevStateId(orderBase.getData());
                     isToCtrlModelDev(dev);
                     break;

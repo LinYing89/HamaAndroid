@@ -346,6 +346,9 @@ public class WelcomeActivity extends AppCompatActivity {
         protected Boolean doInBackground(Void... params) {
             //try {
 
+            Media.get().init(mActivity.get());
+            Config.ins().init(mActivity.get());
+
             //星期信息设为中文
             WeekHelper.ARRAY_WEEKS = new String[]{"日","一","二","三","四","五","六",};
             //设备主编码描述设为中文
@@ -364,12 +367,6 @@ public class WelcomeActivity extends AppCompatActivity {
 //                testRemoterContainer();
             initUser();
 
-            UdpServer.getIns().setUser(HamaApp.USER);
-            UdpServer.getIns().run();
-
-            Media.get().init(mActivity.get());
-            Config.ins().init(mActivity.get());
-
             //设置宫格/列表切换监听
             Config.ins().setOnDevNameShowStyleChangedListener(name -> {
                 if(null != ElectricalCtrlFragment.handler){
@@ -387,43 +384,14 @@ public class WelcomeActivity extends AppCompatActivity {
                     ClimateFragment.handler.obtainMessage(ClimateFragment.CHANGE_LAYOUT_MANAGER).sendToTarget();
                 }
             });
-
-            if(Config.ins().getLoginModel().equals(LoginModel.LOCAL)) {
-                try {
-                    DevServer.getIns().run();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                DevChannelBridge.analysiserName = MyMessageAnalysiser.class.getName();
-                DevChannelBridgeHelper.getIns().stopSeekDeviceOnLineThread();
-                DevChannelBridgeHelper.getIns().startSeekDeviceOnLineThread();
-                DevChannelBridgeHelper.getIns().setOnHeartSendListener(new ChannelBridgeHelperHeartSendListener());
-            }
-
-            LinkageTab.getIns().SetOnOrderSendListener((device, order, ctrlModel) -> {
-                //Log.e("WelcomeAct", "OnOrderSendListener " + "order: " + order + " cm: " + ctrlModel);
-                if(null != order) {
-                    HamaApp.sendOrder(device, order, OrderType.CTRL_DEV, false);
-                }
-            });
-
-            LinkageHelper.getIns().stopCheckLinkageThread();
-            LinkageHelper.getIns().startCheckLinkageThread();
-            GuaguaHelper.getIns().stopCheckGuaguaThread();
-            GuaguaHelper.getIns().startCheckGuaguaThread();
-            GuaguaHelper.getIns().setOnOrderSendListener((guagua, s, ctrlModel) -> HamaApp.sendOrder(guagua.findSuperParent(), s, true));
             return true;
-//            }catch (Exception e){
-//                e.printStackTrace();
-//                return false;
-//            }
         }
 
         @Override
         protected void onPostExecute(final Boolean success) {
             WelcomeActivity theActivity = mActivity.get();
             if (success) {
-                if(Config.ins().isNeedLogin() || HamaApp.USER == null || HamaApp.USER.getName() == null) {
+                if(Config.ins().isNeedLogin() || HamaApp.USER == null || HamaApp.USER.getName() == null || HamaApp.DEV_GROUP == null) {
                     theActivity.startActivity(new Intent(theActivity, LoginActivity.class));
                 }else{
                     MainActivity.IS_ADMIN = false;

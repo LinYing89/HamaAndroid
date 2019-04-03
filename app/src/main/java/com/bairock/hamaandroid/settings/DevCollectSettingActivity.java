@@ -92,7 +92,6 @@ public class DevCollectSettingActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        devCollectSignal.setCalibrationnListener(null);
     }
 
     private void findViews(){
@@ -227,6 +226,8 @@ public class DevCollectSettingActivity extends AppCompatActivity {
             CollectPropertyDao collectPropertyDao = CollectPropertyDao.get(this);
             collectPropertyDao.update(collectProperty);
         }
+
+        devCollectSignal.setCalibrationnListener(null);
 
         collectProperty = null;
         devCollectSignal = null;

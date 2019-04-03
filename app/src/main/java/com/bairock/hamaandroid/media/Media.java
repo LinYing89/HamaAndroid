@@ -24,7 +24,9 @@ public class Media {
     }
 
     public void playCtrlRing(){
-        soundPool.play(soundMap.get(1), 1f, 1f, 1, 0, 1f);
+        if(null != soundPool && null != soundMap) {
+            soundPool.play(soundMap.get(1), 1f, 1f, 1, 0, 1f);
+        }
     }
     public void playAlarm(){
         soundPool.play(soundMap.get(2), 1f, 1f, 1, 0, 1f);

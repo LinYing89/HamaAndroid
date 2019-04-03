@@ -383,7 +383,7 @@ public class SearchActivity extends AppCompatActivity {
                 rootDevice = IntelDevHelper.OPERATE_DEVICE;
                 setDeviceList(((DevHaveChild)rootDevice).getListDev());
             }else if(IntelDevHelper.OPERATE_DEVICE instanceof DevCollect){
-                DevCollectSettingActivity.devCollectSignal = (DevCollectSignal) IntelDevHelper.OPERATE_DEVICE;
+                DevCollectSettingActivity.devCollectSignal = (DevCollect) IntelDevHelper.OPERATE_DEVICE;
                 SearchActivity.this.startActivity(new Intent(SearchActivity.this, DevCollectSettingActivity.class));
             }else if(IntelDevHelper.OPERATE_DEVICE instanceof Remoter){
                 DragRemoteSetLayoutActivity.REMOTER = ((Remoter)IntelDevHelper.OPERATE_DEVICE);

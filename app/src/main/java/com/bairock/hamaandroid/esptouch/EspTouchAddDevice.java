@@ -297,6 +297,8 @@ public class EspTouchAddDevice {
                 device.setCtrlModel(CtrlModel.LOCAL);
                 Device device2 = HamaApp.DEV_GROUP.findDeviceWithCoding(device.getCoding());
                 if(device2 == null) {
+                    int sortIndex = HamaApp.DEV_GROUP.createNextSortIndex();
+                    HamaApp.DEV_GROUP.setDeviceSortIndex(device, sortIndex);
                     //配置成功，保存到数据库
                     device.setDevGroup(HamaApp.DEV_GROUP);
                     //先添加到数据库，后添加到用户组，因为添加到数据库后，如果数据库中已有设备的数据信息

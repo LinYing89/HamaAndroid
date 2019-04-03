@@ -189,7 +189,7 @@ public class LoginActivity extends AppCompatActivity {
             showProgress(false);
 
             if(result.getCode() != 0) {
-                Toast.makeText(getApplicationContext(), "登录失败", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), result.getMsg(), Toast.LENGTH_SHORT).show();
             }else {
                 Config.ins().setServerPadPort(result.getData().getPadPort());
                 Config.ins().setServerDevPort(result.getData().getDevPort());
