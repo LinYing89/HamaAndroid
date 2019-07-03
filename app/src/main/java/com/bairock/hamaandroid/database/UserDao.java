@@ -33,9 +33,10 @@ public class UserDao {
     private static ContentValues getContentValues(User user) {
         ContentValues values = new ContentValues();
         //values.put(TabUser.Cols.EMAIL, user.getEmail());
-        values.put(DbSb.TabUser.Cols.NAME, user.getName());
-        values.put(DbSb.TabUser.Cols.PET_NAME, user.getPetName());
-        values.put(DbSb.TabUser.Cols.PSD, user.getPsd());
+        values.put(DbSb.TabUser.Cols.USER_ID, user.getUserid());
+        values.put(DbSb.TabUser.Cols.NAME, user.getUsername());
+        values.put(DbSb.TabUser.Cols.PET_NAME, user.getPetname());
+        values.put(DbSb.TabUser.Cols.PSD, user.getPassword());
         //values.put(TabUser.Cols.REGISTER_TIME, user.getRegisterTime().getTime());
         //values.put(TabUser.Cols.TEL, user.getTel());
         return values;

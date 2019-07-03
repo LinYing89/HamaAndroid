@@ -75,6 +75,7 @@ public class SettingsActivity2 extends AppCompatPreferenceActivity{
             bindPreferenceSummaryToValue(findPreference(Config.keyDevShowStyle));
             bindPreferenceSummaryToValue(findPreference(Config.keyDevNameShowStyle));
             bindPreferenceSummaryToValue(findPreference(Config.keyCtrlRing));
+            bindPreferenceSummaryToValue(findPreference(Config.keyBootStart));
 
             Preference preferenceUpload = findPreference("upload");
             Preference preferenceDownload = findPreference("download");
@@ -109,11 +110,11 @@ public class SettingsActivity2 extends AppCompatPreferenceActivity{
                             (dialog, whichButton) -> {
                                 showProgressDialog("正在" + title);
                                 if(which == 0){
-                                    HttpUploadTask task = new HttpUploadTask(HamaApp.USER, Config.ins().getServerName());
+                                    HttpUploadTask task = new HttpUploadTask(HamaApp.DEV_GROUP, Config.ins().getServerName());
                                     task.setOnExecutedListener(this::uploadResult);
                                     task.start();
                                 }else{
-                                    HttpDownloadTask task = new HttpDownloadTask(Config.ins().getServerName(), HamaApp.USER.getName(), HamaApp.DEV_GROUP.getName());
+                                    HttpDownloadTask task = new HttpDownloadTask(Config.ins().getServerName(), HamaApp.USER.getUserid(), HamaApp.DEV_GROUP.getName());
                                     task.setOnExecutedListener(this::downloadResult);
                                     task.start();
                                 }
@@ -271,6 +272,9 @@ public class SettingsActivity2 extends AppCompatPreferenceActivity{
                     break;
                 case Config.keyCtrlRing:
                     Config.ins().setCtrlRing(Boolean.parseBoolean(stringValue));
+                    break;
+                case Config.keyBootStart:
+                    Config.ins().setBootStart(Boolean.parseBoolean(stringValue));
                     break;
             }
             return true;

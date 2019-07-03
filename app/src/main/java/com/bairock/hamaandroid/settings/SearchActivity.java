@@ -573,7 +573,7 @@ public class SearchActivity extends AppCompatActivity {
             progressDialog.getButton(DialogInterface.BUTTON_POSITIVE)
                     .setEnabled(false);
 
-            setDevModelThread = new SetDevModelTask(HamaApp.USER.getName(), HamaApp.DEV_GROUP.getName(), device, model, Config.ins().getServerName(), Config.ins().getServerDevPort());
+            setDevModelThread = new SetDevModelTask(HamaApp.USER.getUserid(), HamaApp.DEV_GROUP.getName(), device, model, Config.ins().getServerName(), Config.ins().getServerDevPort());
             setDevModelThread.setOnProgressListener(new com.bairock.iot.intelDev.device.SetDevModelTask.OnProgressListener() {
 
                 @Override

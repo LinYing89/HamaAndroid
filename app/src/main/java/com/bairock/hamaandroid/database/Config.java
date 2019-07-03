@@ -4,8 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-import com.bairock.iot.intelDev.order.LoginModel;
-
 public class Config {
     private  static Config config = new Config();
     private Config(){}
@@ -22,6 +20,7 @@ public class Config {
     public static final String keyDevShowStyle = "showStyle";
     public static final String keyDevNameShowStyle = "nameShowStyle";
     public static final String keyCtrlRing = "ctrlRing";
+    public static final String keyBootStart = "bootStart";
     private static final String keyNeedLogin = "needLogin";
     private static final String keyDownloadId = "downloadId";
     private static final String keyLoginModel = "loginModel";
@@ -37,6 +36,7 @@ public class Config {
     private String devNameShowStyle = "";
 
     private boolean ctrlRing = true;
+    private boolean bootStart = true;
     private boolean needLogin = true;
     private String loginModel;
     //var downloadId = ""
@@ -118,6 +118,14 @@ public class Config {
         this.ctrlRing = ctrlRing;
     }
 
+    public boolean isBootStart() {
+        return bootStart;
+    }
+
+    public void setBootStart(boolean bootStart) {
+        this.bootStart = bootStart;
+    }
+
     public boolean isNeedLogin() {
         return needLogin;
     }
@@ -166,6 +174,12 @@ public class Config {
         loginModel = shared.getString(keyLoginModel, "");
         needLogin = shared.getBoolean(keyNeedLogin, true);
         ctrlRing = shared.getBoolean(keyCtrlRing, true);
+        bootStart = shared.getBoolean(keyBootStart, true);
+    }
+
+    public void initBootStart(Context context){
+        SharedPreferences shared = PreferenceManager.getDefaultSharedPreferences(context);
+        bootStart = shared.getBoolean(keyBootStart, true);
     }
 
     public void setServerInfo(Context context){

@@ -41,6 +41,7 @@
 
     <string name="title_activity_settings2">设置</string>
 
+    <string name="pref_title_boot_start">开机自启动</string>
     <string name="pref_title_ctrl_ring">操作提示音</string>
 
     <string name="quality_hd">高清</string>

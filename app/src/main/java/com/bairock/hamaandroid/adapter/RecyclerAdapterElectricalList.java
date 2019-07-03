@@ -1,6 +1,5 @@
 package com.bairock.hamaandroid.adapter;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -93,10 +92,11 @@ public class RecyclerAdapterElectricalList extends RecyclerView.Adapter<Recycler
                 startAnim(view);
                 device.setGear(Gear.KAI);
                 refreshGear();
-                HamaApp.sendOrder(device, ((IStateDev)device).getTurnOnOrder(), OrderType.CTRL_DEV, true);
 
                 String gearOrder = HamaApp.createDeviceOrder(device, OrderType.GEAR, device.getGear().toString());
                 PadClient.getIns().send(gearOrder);
+
+                HamaApp.sendOrder(device, ((IStateDev)device).getTurnOnOrder(), OrderType.CTRL_DEV, true);
             });
             btnAuto.setOnClickListener(view -> {
                 startAnim(view);
@@ -110,10 +110,11 @@ public class RecyclerAdapterElectricalList extends RecyclerView.Adapter<Recycler
                 startAnim(view);
                 device.setGear(Gear.GUAN);
                 refreshGear();
-                HamaApp.sendOrder(device, ((IStateDev)device).getTurnOffOrder(), OrderType.CTRL_DEV, true);
 
                 String gearOrder = HamaApp.createDeviceOrder(device, OrderType.GEAR, device.getGear().toString());
                 PadClient.getIns().send(gearOrder);
+
+                HamaApp.sendOrder(device, ((IStateDev)device).getTurnOffOrder(), OrderType.CTRL_DEV, true);
             });
         }
 

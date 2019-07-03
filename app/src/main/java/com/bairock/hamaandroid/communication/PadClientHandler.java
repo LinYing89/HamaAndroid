@@ -131,7 +131,7 @@ public class PadClientHandler extends ChannelInboundHandlerAdapter {
                     if(null != HamaApp.USER) {
                         DeviceOrder ob = new DeviceOrder();
                         ob.setOrderType(OrderType.HEAD_USER_INFO);
-                        ob.setUsername(HamaApp.USER.getName());
+                        ob.setUsername(HamaApp.USER.getUserid());
                         ob.setDevGroupName(HamaApp.DEV_GROUP.getName());
                         ob.setData(Config.ins().getLoginModel());
                         order = om.writeValueAsString(ob);
@@ -252,7 +252,7 @@ public class PadClientHandler extends ChannelInboundHandlerAdapter {
         if (null != HamaApp.USER) {
             DeviceOrder ob = new DeviceOrder();
             ob.setOrderType(OrderType.HEAD_USER_INFO);
-            ob.setUsername(HamaApp.USER.getName());
+            ob.setUsername(HamaApp.USER.getUserid());
             ob.setDevGroupName(HamaApp.DEV_GROUP.getName());
             ObjectMapper om = new ObjectMapper();
             String order;

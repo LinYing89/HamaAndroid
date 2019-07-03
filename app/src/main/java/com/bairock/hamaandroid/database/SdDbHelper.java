@@ -23,7 +23,7 @@ import java.util.List;
 import static com.bairock.hamaandroid.database.DbSb.*;
 
 public class SdDbHelper extends SQLiteOpenHelper {
-    private static final int VERSION = 3;
+    private static final int VERSION = 4;
     private static final String DATABASE_NAME = "sd_db.db";
 
     public SdDbHelper(Context context) {
@@ -36,6 +36,7 @@ public class SdDbHelper extends SQLiteOpenHelper {
         db.execSQL("create table " + TabUser.NAME + "(" +
                 " _id integer primary key autoincrement, " +
                 TabUser.Cols.EMAIL + ", " +
+                TabUser.Cols.USER_ID + ", " +
                 TabUser.Cols.NAME + ", " +
                 TabUser.Cols.PET_NAME + ", " +
                 TabUser.Cols.PSD + ", " +
@@ -224,158 +225,24 @@ public class SdDbHelper extends SQLiteOpenHelper {
                 TabAlarmMessage.Cols.TIME +
                 ")"
         );
-
-//        db.execSQL("PRAGMA foreign_keys=ON;");
-//
-//        db.execSQL("ALTER table " + TabCollectProperty.NAME +
-//                " add constraint fk_dev_id foreign key (" +
-//                TabCollectProperty.Cols.DEV_COLLECT_ID +
-//                ") references " + TabDevice.NAME +
-//                " (" + TabDevice.Cols.EFFECT_ID + ") "
-//        );
-//        db.execSQL("ALTER table " + TabConditionHandler.NAME +
-//                " add constraint fk_linkage_id foreign key (" +
-//                TabConditionHandler.Cols.LINKAGE_ID +
-//                ") references " + TabZLoop.NAME +
-//                " (" + TabZLoop.Cols.EFFECT_ID + ") "
-//        );
-//        db.execSQL("ALTER table " + TabDevGroup.NAME +
-//                " add constraint fk_chainHolder_id foreign key (" +
-//                TabDevGroup.Cols.CHAIN_HOLDER_ID +
-//                ") references " + TabLinkageHolder.NAME +
-//                " (" + TabLinkageHolder.Cols.EFFECT_ID + ") "
-//        );
-//        db.execSQL("ALTER table " + TabDevGroup.NAME +
-//                " add constraint fk_guaguaHolder_id foreign key (" +
-//                TabDevGroup.Cols.GUAGUA_HOLDER_ID +
-//                ") references " + TabLinkageHolder.NAME +
-//                " (" + TabLinkageHolder.Cols.EFFECT_ID + ") "
-//        );
-//        db.execSQL("ALTER table " + TabDevGroup.NAME +
-//                " add constraint fk_loopHolder_id foreign key (" +
-//                TabDevGroup.Cols.LOOP_HOLDER_ID +
-//                ") references " + TabLinkageHolder.NAME +
-//                " (" + TabLinkageHolder.Cols.EFFECT_ID + ") "
-//        );
-//        db.execSQL("ALTER table " + TabDevGroup.NAME +
-//                " add constraint fk_timingHolder_id foreign key (" +
-//                TabDevGroup.Cols.TIMING_HOLDER_ID +
-//                ") references " + TabLinkageHolder.NAME +
-//                " (" + TabLinkageHolder.Cols.EFFECT_ID + ") "
-//        );
-//        db.execSQL("ALTER table " + TabDevGroup.NAME +
-//                " add constraint fk_user_id foreign key (" +
-//                TabDevGroup.Cols.USER_ID +
-//                ") references " + TabUser.NAME +
-//                " (id)"
-//        );
-//        db.execSQL("ALTER table " + TabDevice.NAME +
-//                " add constraint fk_devGroup_id foreign key (" +
-//                TabDevice.Cols.DEV_GROUP_ID +
-//                ") references " + TabDevGroup.NAME +
-//                " (" + TabDevGroup.Cols.EFFECT_ID + ") "
-//        );
-//        db.execSQL("ALTER table " + TabDevice.NAME +
-//                " add constraint fk_devGroup_id foreign key (" +
-//                TabDevice.Cols.PARENT_ID +
-//                ") references " + TabDevice.NAME +
-//                " (" + TabDevice.Cols.EFFECT_ID + ") "
-//        );
-//        db.execSQL("ALTER table " + TabEffect.NAME +
-//                " add constraint fk_dev_id foreign key (" +
-//                TabEffect.Cols.DEV_ID +
-//                ") references " + TabDevice.NAME +
-//                " (" + TabDevice.Cols.EFFECT_ID + ") "
-//        );
-//        db.execSQL("ALTER table " + TabEffect.NAME +
-//                " add constraint fk_linkage_id foreign key (" +
-//                TabEffect.Cols.LINKAGE_ID +
-//                ") references " + TabZLoop.NAME +
-//                " (" + TabZLoop.Cols.EFFECT_ID + ") "
-//        );
-//        db.execSQL("ALTER table " + TabEffectGuagua.NAME +
-//                " add constraint fk_linkage_id foreign key (" +
-//                TabEffectGuagua.Cols.EFFECT_ID +
-//                ") references " + TabEffect.NAME +
-//                " (" + TabEffect.Cols.EFFECT_ID + ") "
-//        );
-//        db.execSQL("ALTER table " + TabLinkageCondition.NAME +
-//                " add constraint fk_dev_id foreign key (" +
-//                TabLinkageCondition.Cols.DEV_ID +
-//                ") references " + TabDevice.NAME +
-//                " (" + TabDevice.Cols.EFFECT_ID + ") "
-//        );
-//        db.execSQL("ALTER table " + TabLinkageCondition.NAME +
-//                " add constraint fk_linkage_id foreign key (" +
-//                TabLinkageCondition.Cols.LINKAGE_ID +
-//                ") references " + TabConditionHandler.NAME +
-//                " (" + TabConditionHandler.Cols.EFFECT_ID + ") "
-//        );
-//        db.execSQL("ALTER table " + TabLinkageDevValue.NAME +
-//                " add constraint fk_linkage_holder_id foreign key (" +
-//                TabLinkageDevValue.Cols.LINKAGE_HOLDER_ID +
-//                ") references " + TabLinkageHolder.NAME +
-//                " (" + TabLinkageHolder.Cols.EFFECT_ID + ") "
-//        );
-//        db.execSQL("ALTER table " + TabLoopDuration.NAME +
-//                " add constraint fk_offKeepTime_id foreign key (" +
-//                TabLoopDuration.Cols.OFF_KEEP_TIME_ID +
-//                ") references " + TabMyTime.NAME +
-//                " (" + TabMyTime.Cols.EFFECT_ID + ") "
-//        );
-//        db.execSQL("ALTER table " + TabLoopDuration.NAME +
-//                " add constraint fk_onKeepTime_id foreign key (" +
-//                TabLoopDuration.Cols.ON_KEEP_TIME_ID +
-//                ") references " + TabMyTime.NAME +
-//                " (" + TabMyTime.Cols.EFFECT_ID + ") "
-//        );
-//        db.execSQL("ALTER table " + TabLoopDuration.NAME +
-//                " add constraint fk_linkage_id foreign key (" +
-//                TabLoopDuration.Cols.LINKAGE_ID +
-//                ") references " + TabZLoop.NAME +
-//                " (" + TabZLoop.Cols.EFFECT_ID + ") "
-//        );
-//        db.execSQL("ALTER table " + TabTiming.NAME +
-//                " add constraint fk_linkage_holder_id foreign key (" +
-//                TabTiming.Cols.LINKAGE_HOLDER_ID +
-//                ") references " + TabLinkageHolder.NAME +
-//                " (" + TabLinkageHolder.Cols.EFFECT_ID + ") "
-//        );
-//        db.execSQL("ALTER table " + TabZLoop.NAME +
-//                " add constraint fk_linkage_holder_id foreign key (" +
-//                TabZLoop.Cols.LINKAGE_HOLDER_ID +
-//                ") references " + TabLinkageHolder.NAME +
-//                " (" + TabLinkageHolder.Cols.EFFECT_ID + ") "
-//        );
-//        db.execSQL("ALTER table " + TabZTimer.NAME +
-//                " add constraint fk_offTime_id foreign key (" +
-//                TabZTimer.Cols.OFF_TIME_ID +
-//                ") references " + TabMyTime.NAME +
-//                " (" + TabMyTime.Cols.EFFECT_ID + ") "
-//        );
-//        db.execSQL("ALTER table " + TabZTimer.NAME +
-//                " add constraint fk_onTime_id foreign key (" +
-//                TabZTimer.Cols.ON_TIME_ID +
-//                ") references " + TabMyTime.NAME +
-//                " (" + TabMyTime.Cols.EFFECT_ID + ") "
-//        );
-//        db.execSQL("ALTER table " + TabZTimer.NAME +
-//                " add constraint fk_week_id foreign key (" +
-//                TabZTimer.Cols.WEEK_ID +
-//                ") references " + TabWeekHelper.NAME +
-//                " (" + TabWeekHelper.Cols.EFFECT_ID + ") "
-//        );
-//        db.execSQL("ALTER table " + TabZTimer.NAME +
-//                " add constraint fk_timing_id foreign key (" +
-//                TabZTimer.Cols.TIMING_ID +
-//                ") references " + TabTiming.NAME +
-//                " (" + TabTiming.Cols.EFFECT_ID + ") "
-//        );
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        for (int i = oldVersion; i < newVersion; i++) {
+            switch (i) {
+                case 3:
+                    updateTo4(db);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
 
+    private void updateTo4(SQLiteDatabase db){
+        String sql = "alter table " + TabUser.NAME + " add " + TabUser.Cols.USER_ID;
+        db.execSQL(sql);
     }
 
     private static void cleanDb(){

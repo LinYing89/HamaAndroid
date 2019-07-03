@@ -19,6 +19,7 @@ public class DbSb {
              * 邮箱
              */
             public static final String ID = "_id";
+            public static final String USER_ID = "userid";
             /**
              * 邮箱
              */

@@ -114,25 +114,31 @@ public class RecyclerAdapterElectrical3 extends RecyclerView.Adapter<RecyclerAda
                     case ZIDONG:
                         if (device.isKaiState()) {
                             toGuanGear();
+                            sendGear();
                             HamaApp.sendOrder(device, dev.getTurnOffOrder(), OrderType.CTRL_DEV, true);
                         } else {
                             toKaiGear();
+                            sendGear();
                             HamaApp.sendOrder(device, dev.getTurnOnOrder(), OrderType.CTRL_DEV, true);
                         }
                         break;
                     case KAI:
                         toGuanGear();
+                        sendGear();
                         HamaApp.sendOrder(device, dev.getTurnOffOrder(), OrderType.CTRL_DEV, true);
                         break;
                     default:
                         toKaiGear();
+                        sendGear();
                         HamaApp.sendOrder(device, dev.getTurnOnOrder(), OrderType.CTRL_DEV, true);
                         break;
                 }
-
-                String gearOrder = HamaApp.createDeviceOrder(device, OrderType.GEAR, device.getGear().toString());
-                PadClient.getIns().send(gearOrder);
             });
+        }
+
+        private void sendGear(){
+            String gearOrder = HamaApp.createDeviceOrder(device, OrderType.GEAR, device.getGear().toString());
+            PadClient.getIns().send(gearOrder);
         }
 
         public void setData(Device device) {

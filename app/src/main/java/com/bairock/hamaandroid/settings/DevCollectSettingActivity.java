@@ -18,13 +18,10 @@ import android.widget.Toast;
 import com.bairock.hamaandroid.R;
 import com.bairock.hamaandroid.database.CollectPropertyDao;
 import com.bairock.hamaandroid.database.DeviceDao;
-import com.bairock.hamaandroid.settings.ValueChangeLinkageActivity;
-import com.bairock.hamaandroid.settings.ValueTriggerListActivity;
 import com.bairock.iot.intelDev.communication.DevChannelBridgeHelper;
 import com.bairock.iot.intelDev.device.devcollect.CollectProperty;
 import com.bairock.iot.intelDev.device.devcollect.CollectSignalSource;
 import com.bairock.iot.intelDev.device.devcollect.DevCollect;
-import com.bairock.iot.intelDev.device.devcollect.DevCollectSignal;
 
 public class DevCollectSettingActivity extends AppCompatActivity {
 
@@ -268,8 +265,8 @@ public class DevCollectSettingActivity extends AppCompatActivity {
                 }
                 try{
                     float fValue = Float.parseFloat(value);
-                    if(fValue < 0 || fValue > 10){
-                        Toast.makeText(this, "标定值范围为0-10", Toast.LENGTH_SHORT).show();
+                    if(fValue < 0 || fValue > 100){
+                        Toast.makeText(this, "标定值范围为0-100", Toast.LENGTH_SHORT).show();
                         return;
                     }
                     devCollectSignal.setCalibrationnListener(res ->{
@@ -290,7 +287,7 @@ public class DevCollectSettingActivity extends AppCompatActivity {
                     showCalibrationDialog();
                     calibrationThread = new CalibrationThread();
                     calibrationThread.start();
-                    String order = devCollectSignal.createCalibrationOrder((int)fValue);
+                    String order = devCollectSignal.createCalibrationOrder(fValue);
                     DevChannelBridgeHelper.getIns().sendDevOrder(devCollectSignal, order, true);
                 }catch (Exception e){
                     Snackbar.make(btnCalibration, "标定值包含非法字符!", Snackbar.LENGTH_SHORT).show();

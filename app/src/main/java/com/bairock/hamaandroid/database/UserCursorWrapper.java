@@ -21,6 +21,7 @@ public class UserCursorWrapper extends CursorWrapper {
     public User getUser() {
         Long id = getLong(getColumnIndex(DbSb.TabUser.Cols.ID));
         String email = getString(getColumnIndex(DbSb.TabUser.Cols.EMAIL));
+        String userid = getString(getColumnIndex(DbSb.TabUser.Cols.USER_ID));
         String name = getString(getColumnIndex(DbSb.TabUser.Cols.NAME));
         String petName = getString(getColumnIndex(DbSb.TabUser.Cols.PET_NAME));
         String psd = getString(getColumnIndex(DbSb.TabUser.Cols.PSD));
@@ -29,9 +30,10 @@ public class UserCursorWrapper extends CursorWrapper {
         User user = new User();
         user.setId(id);
         user.setEmail(email);
-        user.setName(name);
-        user.setPetName(petName);
-        user.setPsd(psd);
+        user.setUserid(userid);
+        user.setUsername(name);
+        user.setPetname(petName);
+        user.setPassword(psd);
         user.setRegisterTime(new Date(date));
         user.setTel(tel);
         return user;

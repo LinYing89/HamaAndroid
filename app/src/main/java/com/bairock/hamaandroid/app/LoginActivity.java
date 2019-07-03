@@ -79,7 +79,7 @@ public class LoginActivity extends AppCompatActivity {
 
         String userName = "";
         if(null != HamaApp.USER){
-            userName = HamaApp.USER.getName();
+            userName = HamaApp.USER.getUserid();
         }
         etUserName.setText(userName);
 
@@ -102,6 +102,10 @@ public class LoginActivity extends AppCompatActivity {
         String userName = etUserName.getText().toString();
         String groupName = etGroupName.getText().toString();
         String groupPsd = etGroupPsd.getText().toString();
+        if(userName.isEmpty() || groupName.isEmpty() || groupPsd.isEmpty()){
+            Toast.makeText(this, "输入不能为空!", Toast.LENGTH_SHORT).show();
+            return;
+        }
         String url = String.format("http://%s/group/client/devGroupLogin/%s/%s/%s/%s", Config.ins().getServerName(), loginModel, userName, groupName, groupPsd);
         //开启线程登录
         LoginTask loginTask = new LoginTask(url);
@@ -120,9 +124,9 @@ public class LoginActivity extends AppCompatActivity {
             case R.id.btnLoginOffline:
                 User user = new User();
                 user.setId(1L);
-                user.setName("admin");
-                user.setPsd("admin123");
-                user.setPetName("admin");
+                user.setUserid("admin");
+                user.setPassword("admin123");
+                user.setPetname("admin");
                 user.setRegisterTime(new Date());
                 user.setTel("888");
                 DevGroup group = new DevGroup();
@@ -137,9 +141,9 @@ public class LoginActivity extends AppCompatActivity {
                     UserDao userDao = UserDao.get(LoginActivity.this);
                     userDao.addUser(user);
                 }else{
-                    HamaApp.USER.setName(user.getName());
-                    HamaApp.USER.setPsd(user.getPsd());
-                    HamaApp.USER.setPetName(user.getPetName());
+                    HamaApp.USER.setUserid(user.getUserid());
+                    HamaApp.USER.setPassword(user.getPassword());
+                    HamaApp.USER.setPetname(user.getPetname());
                     HamaApp.USER.setRegisterTime(user.getRegisterTime());
                     HamaApp.USER.setTel(user.getTel());
                     UserDao userDao = UserDao.get(LoginActivity.this);
@@ -154,7 +158,7 @@ public class LoginActivity extends AppCompatActivity {
                 }else{
                     HamaApp.DEV_GROUP.setName(group.getName());
                     HamaApp.DEV_GROUP.setPsd(group.getPsd());
-                    HamaApp.DEV_GROUP.setPetName(user.getPetName());
+                    HamaApp.DEV_GROUP.setPetName(user.getPetname());
                     DevGroupDao devGroupDao = DevGroupDao.get(LoginActivity.this);
                     devGroupDao.update(HamaApp.DEV_GROUP);
                 }
@@ -207,10 +211,10 @@ public class LoginActivity extends AppCompatActivity {
                     HamaApp.USER.addGroup(HamaApp.DEV_GROUP);
                     UdpServer.getIns().setUser(HamaApp.USER);
                 }
-                String oldUserName = HamaApp.USER.getName();
+                String oldUserName = HamaApp.USER.getUserid();
                 String oldGroupName = HamaApp.DEV_GROUP.getName();
                 String oldPsd = HamaApp.DEV_GROUP.getPsd();
-                HamaApp.USER.setName(etUserName.getText().toString());
+                HamaApp.USER.setUserid(etUserName.getText().toString());
                 HamaApp.DEV_GROUP.setName(etGroupName.getText().toString());
                 HamaApp.DEV_GROUP.setPsd(etGroupPsd.getText().toString());
                 HamaApp.DEV_GROUP.setPetName(petName);
@@ -224,7 +228,7 @@ public class LoginActivity extends AppCompatActivity {
                 }else {
                     userDao.updateUser(HamaApp.USER);
                     devGroupDao.update(HamaApp.DEV_GROUP);
-                    if(!HamaApp.USER.getName().equals(oldUserName) || !HamaApp.DEV_GROUP.getName().equals(oldGroupName)
+                    if(!HamaApp.USER.getUserid().equals(oldUserName) || !HamaApp.DEV_GROUP.getName().equals(oldGroupName)
                             || !HamaApp.DEV_GROUP.getPsd().equals(oldPsd)){
                         //重新生成设备id
                         refreshDbId();

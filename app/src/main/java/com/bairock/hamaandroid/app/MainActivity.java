@@ -134,7 +134,7 @@ public class MainActivity extends AppCompatActivity
         }else{
             groupName = HamaApp.DEV_GROUP.getPetName();
         }
-        title = HamaApp.USER.getName() + "-" + groupName;
+        title = HamaApp.USER.getUserid() + "-" + groupName;
         toolbar.setTitle(title);
         //toolbar.setSubtitle(subTitle);
 

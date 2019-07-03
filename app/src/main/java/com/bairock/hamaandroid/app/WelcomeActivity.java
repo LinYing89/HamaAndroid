@@ -213,8 +213,8 @@ public class WelcomeActivity extends AppCompatActivity {
 
     private static void testDeviceBx(){
         User user = new User();
-        user.setName("test123");
-        user.setPsd("a123456");
+        user.setUserid("test123");
+        user.setPassword("a123456");
         UserDao userDao = UserDao.get(HamaApp.HAMA_CONTEXT);
         userDao.clean();
         userDao.addUser(user);
@@ -238,8 +238,8 @@ public class WelcomeActivity extends AppCompatActivity {
 
     private static void testDevice(){
         User user = new User();
-        user.setName("test123");
-        user.setPsd("a123456");
+        user.setUserid("test123");
+        user.setPassword("a123456");
         UserDao userDao = UserDao.get(HamaApp.HAMA_CONTEXT);
         userDao.clean();
         userDao.addUser(user);
@@ -282,8 +282,8 @@ public class WelcomeActivity extends AppCompatActivity {
 
     private static void testCoordinator(){
         User user = new User();
-        user.setName("test123");
-        user.setPsd("a123456");
+        user.setUserid("test123");
+        user.setPassword("a123456");
         UserDao userDao = UserDao.get(HamaApp.HAMA_CONTEXT);
         userDao.clean();
         userDao.addUser(user);
@@ -315,8 +315,8 @@ public class WelcomeActivity extends AppCompatActivity {
 
     private static void testRemoterContainer(){
         User user = new User();
-        user.setName("test123");
-        user.setPsd("a123456");
+        user.setUserid("test123");
+        user.setPassword("a123456");
         UserDao userDao = UserDao.get(HamaApp.HAMA_CONTEXT);
         userDao.clean();
         userDao.addUser(user);
@@ -391,7 +391,7 @@ public class WelcomeActivity extends AppCompatActivity {
         protected void onPostExecute(final Boolean success) {
             WelcomeActivity theActivity = mActivity.get();
             if (success) {
-                if(Config.ins().isNeedLogin() || HamaApp.USER == null || HamaApp.USER.getName() == null || HamaApp.DEV_GROUP == null) {
+                if(Config.ins().isNeedLogin() || HamaApp.USER == null || HamaApp.USER.getUserid() == null || HamaApp.DEV_GROUP == null) {
                     theActivity.startActivity(new Intent(theActivity, LoginActivity.class));
                 }else{
                     MainActivity.IS_ADMIN = false;

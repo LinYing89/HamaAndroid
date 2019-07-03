@@ -241,12 +241,4 @@ public class HamaApp extends Application {
         }
         return json;
     }
-
-    public static String getGroupTag(){
-        String tag = null;
-        if(HamaApp.USER != null && HamaApp.USER.getName() != null){
-            tag = HamaApp.USER.getName() + "_" + HamaApp.DEV_GROUP.getName();
-        }
-        return tag;
-    }
 }
