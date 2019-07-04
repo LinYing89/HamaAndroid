@@ -149,6 +149,7 @@ public class RecyclerAdapterElectricalList extends RecyclerView.Adapter<Recycler
         private void refreshState() {
             if (!device.isNormal()) {
                 textName.setTextColor(HamaApp.abnormalColorId);
+                viewRoot.setBackgroundColor(Color.TRANSPARENT);
             } else {
                 textName.setTextColor(colorNormal);
                 if(device.isKaiState()){
