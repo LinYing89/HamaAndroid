@@ -170,12 +170,13 @@ public class PadClientHandler extends ChannelInboundHandlerAdapter {
                         return;
                     }
                     dev.setCtrlModel(CtrlModel.REMOTE);
-                    IStateDev stateDev = (IStateDev)dev;
-                    if(orderBase.getData().equals(DevStateHelper.DS_KAI)) {
-                        order = stateDev.getTurnOnOrder();
-                    }else {
-                        order = stateDev.getTurnOffOrder();
-                    }
+//                    IStateDev stateDev = (IStateDev)dev;
+//                    if(orderBase.getData().equals(DevStateHelper.DS_KAI)) {
+//                        order = stateDev.getTurnOnOrder();
+//                    }else {
+//                        order = stateDev.getTurnOffOrder();
+//                    }
+                    order = orderBase.getData();
                     DevChannelBridgeHelper.getIns().sendDevOrder(dev, order, true);
                     break;
                 case STATE:
