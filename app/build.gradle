@@ -15,8 +15,8 @@ android {
         applicationId "com.bairock.hamaandroid"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 16
-        versionName "1.321"
+        versionCode 17
+        versionName "1.322"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         signingConfig signingConfigs.config
 

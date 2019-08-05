@@ -6,19 +6,16 @@ import android.content.Context;
 import android.os.Build;
 import android.os.StrictMode;
 import android.support.multidex.MultiDex;
-import android.util.Log;
 
 import com.bairock.hamaandroid.R;
 import com.bairock.hamaandroid.communication.PadClient;
 import com.bairock.hamaandroid.database.Config;
 import com.bairock.iot.intelDev.communication.DevChannelBridgeHelper;
-import com.bairock.iot.intelDev.communication.DevServer;
 import com.bairock.iot.intelDev.communication.FindDevHelper;
 import com.bairock.iot.intelDev.device.Coordinator;
 import com.bairock.iot.intelDev.device.DevHaveChild;
 import com.bairock.iot.intelDev.device.Device;
 import com.bairock.iot.intelDev.device.devcollect.DevCollect;
-import com.bairock.iot.intelDev.device.devswitch.SubDev;
 import com.bairock.iot.intelDev.order.DeviceOrder;
 import com.bairock.iot.intelDev.order.OrderType;
 import com.bairock.iot.intelDev.user.DevGroup;
@@ -26,12 +23,9 @@ import com.bairock.iot.intelDev.user.User;
 import com.bairock.iot.intelDev.user.Util;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tencent.bugly.Bugly;
-import com.tencent.bugly.crashreport.CrashReport;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.persistence.criteria.Order;
 
 public class HamaApp extends Application {
     public static User USER;
@@ -126,8 +120,15 @@ public class HamaApp extends Application {
                 DevChannelBridgeHelper.getIns().sendDevOrder(device, order, immediately);
                 break;
             case REMOTE:
+                Device superParent = device.findSuperParent();
                 devOrder = createDeviceOrder(device, orderType, order);
-                PadClient.getIns().send(devOrder);
+                if(immediately) {
+                    PadClient.getIns().send(devOrder);
+                }else if (superParent.canSend()) {
+                    superParent.setLastOrder(order);
+                    superParent.resetLastCommunicationTime();
+                    PadClient.getIns().send(devOrder);
+                }
                 break;
         }
     }

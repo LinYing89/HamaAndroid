@@ -153,6 +153,12 @@ public class PadClientHandler extends ChannelInboundHandlerAdapter {
                     order = om.writeValueAsString(orderBase);
                     send(order);
                     break;
+                case REFRESH_STATE:
+                    if (Config.ins().getLoginModel().equals(LoginModel.LOCAL)) {
+                        // 发送设备状态
+                        sendInitStateToServer();
+                    }
+                    break;
                 case GEAR :
                     dev = HamaApp.DEV_GROUP.findDeviceWithCoding(orderBase.getLongCoding());
                     if(null == dev){
