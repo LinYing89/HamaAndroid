@@ -1,9 +1,6 @@
 package com.bairock.hamaandroid.communication;
 
-import android.app.AlertDialog;
-import android.os.Build;
 import android.util.Log;
-import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.bairock.hamaandroid.app.HamaApp;
@@ -24,6 +21,7 @@ import com.bairock.iot.intelDev.device.SetDevModelTask;
 import com.bairock.iot.intelDev.device.devcollect.DevCollect;
 import com.bairock.iot.intelDev.order.DeviceOrder;
 import com.bairock.iot.intelDev.order.LoginModel;
+import com.bairock.iot.intelDev.order.OrderBase;
 import com.bairock.iot.intelDev.order.OrderType;
 import com.bairock.iot.intelDev.user.IntelDevHelper;
 import com.bairock.iot.intelDev.user.Util;
@@ -38,6 +36,7 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 
 /**
@@ -85,9 +84,33 @@ public class PadClientHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
-        super.userEventTriggered(ctx, evt);
         if (evt instanceof IdleStateEvent) {  // 2
-            ctx.close();
+            IdleStateEvent event = (IdleStateEvent) evt;
+            String type = "";
+            if (event.state() == IdleState.READER_IDLE) {
+                type = "read idle";
+            } else if (event.state() == IdleState.WRITER_IDLE) {
+                type = "write idle";
+                sendHeart();
+            } else if (event.state() == IdleState.ALL_IDLE) {
+                type = "all idle";
+            }
+            System.out.println( ctx.channel().remoteAddress()+"超时类型：" + type);
+        } else {
+            super.userEventTriggered(ctx, evt);
+        }
+    }
+
+    private void sendHeart() {
+        ObjectMapper om = new ObjectMapper();
+        OrderBase ob = new OrderBase();
+        ob.setOrderType(OrderType.HEAD_SYN);
+        try {
+            String heart = om.writeValueAsString(ob);
+            send(heart);
+        } catch (JsonProcessingException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
     }
 
@@ -125,7 +148,7 @@ public class PadClientHandler extends ChannelInboundHandlerAdapter {
         try {
             Device dev;
             DeviceOrder orderBase = om.readValue(strData, DeviceOrder.class);
-            String order = "";
+            String order;
             switch(orderBase.getOrderType()) {
                 case HEAD_USER_INFO :
                     if(null != HamaApp.USER) {
@@ -145,13 +168,13 @@ public class PadClientHandler extends ChannelInboundHandlerAdapter {
                     break;
                 case HEAD_SYN :
                     syncDevMsg = true;
-                    order = om.writeValueAsString(orderBase);
-                    send(order);
+//                    order = om.writeValueAsString(orderBase);
+//                    send(order);
                     break;
                 case HEAD_NOT_SYN :
                     syncDevMsg = false;
-                    order = om.writeValueAsString(orderBase);
-                    send(order);
+//                    order = om.writeValueAsString(orderBase);
+//                    send(order);
                     break;
                 case REFRESH_STATE:
                     if (Config.ins().getLoginModel().equals(LoginModel.LOCAL)) {
@@ -255,7 +278,7 @@ public class PadClientHandler extends ChannelInboundHandlerAdapter {
 
     }
 
-    public void sendUserInfo() {
+    void sendUserInfo() {
         if (null != HamaApp.USER) {
             DeviceOrder ob = new DeviceOrder();
             ob.setOrderType(OrderType.HEAD_USER_INFO);
