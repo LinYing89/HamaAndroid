@@ -15,6 +15,7 @@ import com.bairock.hamaandroid.R;
 import com.bairock.hamaandroid.app.HamaApp;
 import com.bairock.hamaandroid.database.EffectDao;
 import com.bairock.iot.intelDev.device.DevStateHelper;
+import com.bairock.iot.intelDev.device.IStateDev;
 import com.bairock.iot.intelDev.linkage.Effect;
 
 import java.util.List;
@@ -23,12 +24,10 @@ public class RecyclerAdapterEffect extends RecyclerView.Adapter<RecyclerAdapterE
 
     private LayoutInflater mInflater;
     private List<Effect> listEffect;
-    private boolean showSwitch;
 
     public RecyclerAdapterEffect(Context context, List<Effect> listEffect, boolean showSwitch) {
         this.mInflater = LayoutInflater.from(context);
         this.listEffect = listEffect;
-        this.showSwitch = showSwitch;
     }
 
     @Override
@@ -39,7 +38,7 @@ public class RecyclerAdapterEffect extends RecyclerView.Adapter<RecyclerAdapterE
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ViewHolder(mInflater.inflate(R.layout.adapter_list_effect, parent, false), showSwitch);
+        return new ViewHolder(mInflater.inflate(R.layout.adapter_list_effect, parent, false));
     }
 
     @Override
@@ -51,14 +50,12 @@ public class RecyclerAdapterEffect extends RecyclerView.Adapter<RecyclerAdapterE
 
         private Effect effect;
         private TextView txtDevice;
-        private Switch switchState;
-        private boolean showSwitch;
+        private TextView txtValue;
 
-        ViewHolder(View itemView, boolean showSwitch){
+        ViewHolder(View itemView){
             super(itemView);
-            this.showSwitch = showSwitch;
             txtDevice = itemView.findViewById(R.id.txtDevice);
-            switchState  = itemView.findViewById(R.id.switchState);
+            txtValue  = itemView.findViewById(R.id.txtValue);
         }
 
         public void setData(Effect effect) {
@@ -67,25 +64,23 @@ public class RecyclerAdapterEffect extends RecyclerView.Adapter<RecyclerAdapterE
         }
 
         private void init(){
-            if(showSwitch){
-                switchState.setVisibility(View.VISIBLE);
-            }else{
-                switchState.setVisibility(View.GONE);
-            }
             if(effect.getDevice().isDeleted()){
                 txtDevice.setTextColor(Color.RED);
             }else{
                 txtDevice.setTextColor(Color.BLACK);
             }
             txtDevice.setText(effect.getDevice().getName());
-            if(switchState.getVisibility() == View.VISIBLE) {
-                if (effect.getDsId().equals(DevStateHelper.DS_KAI)) {
-                    switchState.setChecked(true);
-                } else {
-                    switchState.setChecked(false);
+            String value = "";
+            if(effect.getDevice() instanceof IStateDev){
+                if(effect.getDsId().equals(DevStateHelper.DS_GUAN)){
+                    value = "关";
+                }else{
+                    value = "开";
                 }
+            }else {
+                value = effect.getEffectContent();
             }
-            switchState.setOnCheckedChangeListener(onCheckedChangeListener);
+            txtValue.setText(value);
         }
 
         CompoundButton.OnCheckedChangeListener onCheckedChangeListener = new CompoundButton.OnCheckedChangeListener() {

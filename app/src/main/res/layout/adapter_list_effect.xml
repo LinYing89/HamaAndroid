@@ -14,14 +14,23 @@
         android:text="TextView"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
-    <Switch
-        android:id="@+id/switchState"
+    <TextView
+        android:id="@+id/txtValue"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
-        android:focusable="false"
+        android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp" />
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:text="TextView"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+    <!--    <Switch-->
+<!--        android:id="@+id/switchState"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:layout_alignParentEnd="true"-->
+<!--        android:layout_alignParentRight="true"-->
+<!--        android:layout_centerVertical="true"-->
+<!--        android:focusable="false"-->
+<!--        android:layout_marginEnd="8dp"-->
+<!--        android:layout_marginRight="8dp" />-->
 </RelativeLayout>

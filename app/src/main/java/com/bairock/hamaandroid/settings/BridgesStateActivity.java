@@ -82,6 +82,14 @@ public class BridgesStateActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        if(null != myHandler){
+            myHandler.obtainMessage(0).sendToTarget();
+        }
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         myHandler = null;

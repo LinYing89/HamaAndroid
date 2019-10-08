@@ -121,6 +121,7 @@ public class EditChainActivity extends AppCompatActivity {
         swipeMenuRecyclerViewCondition.setSwipeItemClickListener(conditionSwipeItemClickListener);
         swipeMenuRecyclerViewCondition.setSwipeMenuItemClickListener(conditionSwipeMenuItemClickListener);
 
+        swipeMenuRecyclerViewEffect.setSwipeItemClickListener(effectSwipeItemClickListener);
         swipeMenuRecyclerViewEffect.setSwipeMenuItemClickListener(effectSwipeMenuItemClickListener);
     }
 
@@ -162,7 +163,10 @@ public class EditChainActivity extends AppCompatActivity {
                     startActivity(new Intent(EditChainActivity.this, ConditionActivity.class));
                     break;
                 case R.id.btnAddEffect:
-                    showDeviceList();
+                    EffectActivity.ADD = true;
+                    EffectActivity.handler = handler;
+                    startActivity(new Intent(EditChainActivity.this, EffectActivity.class));
+//                    showDeviceList();
                     break;
             }
         }
@@ -177,6 +181,18 @@ public class EditChainActivity extends AppCompatActivity {
             ConditionActivity.handler = handler;
             ConditionActivity.condition = condition;
             startActivity(new Intent(EditChainActivity.this, ConditionActivity.class));
+        }
+    };
+
+    //影响列表点击事件
+    private SwipeItemClickListener effectSwipeItemClickListener = new SwipeItemClickListener() {
+        @Override
+        public void onItemClick(View itemView, int position) {
+            Effect effect = subChain.getListEffect().get(position);
+            EffectActivity.ADD = false;
+            EffectActivity.handler = handler;
+            EffectActivity.effect = effect;
+            startActivity(new Intent(EditChainActivity.this, EffectActivity.class));
         }
     };
 
@@ -270,6 +286,20 @@ public class EditChainActivity extends AppCompatActivity {
                     LinkageConditionDao linkageConditionDao1 = LinkageConditionDao.get(theActivity);
                     linkageConditionDao1.update(lc1, null);
                     theActivity.adapterCondition.notifyDataSetChanged();
+                    break;
+                case EffectActivity.ADD_EFFECT:
+                    Effect effect = (Effect) msg.obj;
+                    theActivity.subChain.addEffect(effect);
+                    theActivity.subChain.getListEffect().add(effect);
+                    EffectDao effectDao = EffectDao.get(theActivity);
+                    effectDao.add(effect, theActivity.subChain.getId());
+                    theActivity.adapterEffect.notifyDataSetChanged();
+                    break;
+                case EffectActivity.UPDATE_EFFECT:
+                    Effect effect1 = (Effect) msg.obj;
+                    EffectDao effectDao1 = EffectDao.get(theActivity);
+                    effectDao1.update(effect1, null);
+                    theActivity.adapterEffect.notifyDataSetChanged();
                     break;
             }
 

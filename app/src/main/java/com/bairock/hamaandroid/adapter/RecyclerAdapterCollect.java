@@ -18,7 +18,6 @@ import com.bairock.hamaandroid.settings.DevCollectSettingActivity;
 import com.bairock.iot.intelDev.device.Device;
 import com.bairock.iot.intelDev.device.devcollect.CollectSignalSource;
 import com.bairock.iot.intelDev.device.devcollect.DevCollect;
-import com.bairock.iot.intelDev.device.devcollect.DevCollectSignal;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -29,8 +28,6 @@ public class RecyclerAdapterCollect extends RecyclerView.Adapter<RecyclerAdapter
     public static final int STATE = 0;
     public static final int VALUE = 1;
     public static final int NAME = 2;
-    public static final int SRC_NAME = 4;
-    public static final int SIMULATOR = 5;
     public static final int SYMBOL = 6;
 
     public MyHandler handler;
@@ -122,7 +119,7 @@ public class RecyclerAdapterCollect extends RecyclerView.Adapter<RecyclerAdapter
                     textState.setText("?");
                 }
             } else {
-                textState.setText(String.valueOf(device.getCollectProperty().getCurrentValue()));
+                textState.setText(String.valueOf(device.getCollectProperty().createFormatValue()));
             }
         }
 

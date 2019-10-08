@@ -15,33 +15,27 @@ import android.widget.TableRow;
 
 import com.bairock.hamaandroid.R;
 import com.bairock.hamaandroid.app.HamaApp;
-import com.bairock.iot.intelDev.device.CompareSymbol;
+import com.bairock.iot.intelDev.device.DevStateHelper;
 import com.bairock.iot.intelDev.device.Device;
 import com.bairock.iot.intelDev.device.IStateDev;
 import com.bairock.iot.intelDev.device.IValueDevice;
-import com.bairock.iot.intelDev.device.devcollect.DevCollect;
-import com.bairock.iot.intelDev.linkage.LinkageCondition;
-import com.bairock.iot.intelDev.linkage.ZLogic;
+import com.bairock.iot.intelDev.linkage.Effect;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ConditionActivity extends AppCompatActivity {
+public class EffectActivity extends AppCompatActivity {
 
-    public static final int ADD_CONDITION = 3;
-    public static final int UPDATE_CONDITION = 4;
+    public static final int ADD_EFFECT = 5;
+    public static final int UPDATE_EFFECT = 6;
 
     public static boolean ADD = false;
-    public static LinkageCondition condition;
+    public static Effect effect;
     public static Handler handler;
 
     private TableRow tabrowTriggerValueSpinner;
     private TableRow tabrowTriggerValueEdit;
-    private Spinner spinnerLogic;
     private Spinner spinnerDevice;
-    private Spinner spinnerSymbol;
-    //spinnerTriggerStyle = (Spinner)findViewById(R.id.spinnerTriggerStyle);
-    //private Spinner spinnerTriggerStyle;
     private Spinner spinnerValue;
     private EditText editValue;
     private Button btnSave;
@@ -52,7 +46,8 @@ public class ConditionActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_condition);
+        setContentView(R.layout.activity_effect);
+
         android.support.v7.app.ActionBar actionBar = getSupportActionBar();
         if(actionBar != null){
             actionBar.setHomeButtonEnabled(true);
@@ -62,7 +57,7 @@ public class ConditionActivity extends AppCompatActivity {
         findViews();
         setSpinners();
         if(ADD){
-            condition = new LinkageCondition();
+            effect = new Effect();
         }
         init();
         setListener();
@@ -87,37 +82,20 @@ public class ConditionActivity extends AppCompatActivity {
         tabrowTriggerValueSpinner =  findViewById(R.id.tabrowTriggerValueSpinner);
         tabrowTriggerValueEdit = findViewById(R.id.tabrowTriggerValueEdit);
         spinnerValue = findViewById(R.id.spinnerValue);
-        spinnerLogic = findViewById(R.id.spinnerLogic);
         spinnerDevice = findViewById(R.id.spinnerDevices);
-        spinnerSymbol = findViewById(R.id.spinnerSymbol);
         editValue = findViewById(R.id.etxtValue);
         btnSave = findViewById(R.id.btn_save);
         btnCancel = findViewById(R.id.btn_cancel);
     }
 
     private void setSpinners(){
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                this,android.R.layout.simple_expandable_list_item_1, getResources().getStringArray(R.array.array_event_style));
-        spinnerLogic .setAdapter(adapter);
-
-        ArrayAdapter<String> adapter1 = new ArrayAdapter<>(
-                this,android.R.layout.simple_expandable_list_item_1, getResources().getStringArray(R.array.array_event_symbol));
-        spinnerSymbol .setAdapter(adapter1);
-
-//        ArrayAdapter<String> adapter2 = new ArrayAdapter<>(
-//                this,android.R.layout.simple_expandable_list_item_1, getResources().getStringArray(R.array.array_trigger_style));
-//        spinnerTriggerStyle .setAdapter(adapter2);
-
         ArrayAdapter<String> adapter3 = new ArrayAdapter<>(
                 this,android.R.layout.simple_expandable_list_item_1, getResources().getStringArray(R.array.array_event_state));
         spinnerValue .setAdapter(adapter3);
     }
 
     private void setListener(){
-        spinnerLogic.setOnItemSelectedListener(styleOnItemSelectedListener);
         spinnerDevice.setOnItemSelectedListener(deviceOnItemSelectedListener);
-        spinnerSymbol.setOnItemSelectedListener(symbolOnItemSelectedListener);
-        //spinnerTriggerStyle.setOnItemSelectedListener(triggerStyleOnItemSelectedListener);
         spinnerValue.setOnItemSelectedListener(valueOnItemSelectedListener);
         btnSave.setOnClickListener(onClickListener);
         btnCancel.setOnClickListener(onClickListener);
@@ -126,24 +104,18 @@ public class ConditionActivity extends AppCompatActivity {
     private void init(){
         listDevice = new ArrayList<>();
         listDevice.addAll(HamaApp.DEV_GROUP.findListIStateDev(true));
-        listDevice.addAll(HamaApp.DEV_GROUP.findListCollectDev(true));
+        listDevice.addAll(HamaApp.DEV_GROUP.findListDevParam(true));
         List<String> listDeviceName = new ArrayList<>();
         for(Device device : listDevice){
             listDeviceName.add(device.getName());
         }
         spinnerDevice.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_expandable_list_item_1,listDeviceName));
 
-        if(condition.getLogic() == ZLogic.AND){
-            spinnerLogic.setSelection(0);
-        }else{
-            spinnerLogic.setSelection(1);
-        }
-
-        int iDevice = listDevice.indexOf(condition.getDevice());
+        int iDevice = listDevice.indexOf(effect.getDevice());
         iDevice = iDevice == -1 ? 0 : iDevice;
         spinnerDevice.setSelection(iDevice);
 
-        if(condition.getDevice() instanceof IStateDev){
+        if(effect.getDevice() instanceof IStateDev){
             showElectricalStyle();
         }else{
             showClimateStyle();
@@ -151,55 +123,21 @@ public class ConditionActivity extends AppCompatActivity {
     }
 
     private void showElectricalStyle(){
-        //select '==' symbol
-        spinnerSymbol.setSelection(1);
-        spinnerSymbol.setEnabled(false);
-
-        //select value trigger
-//        spinnerTriggerStyle.setSelection(1);
-//        spinnerTriggerStyle.setEnabled(false);
-
         tabrowTriggerValueSpinner.setVisibility(View.VISIBLE);
         tabrowTriggerValueEdit.setVisibility(View.GONE);
-
-        //condition.setCompareValue(0f);
-        spinnerValue.setSelection((int)condition.getCompareValue());
+        if(effect.getDsId().equals(DevStateHelper.DS_GUAN)){
+            spinnerValue.setSelection(0);
+        }else{
+            spinnerValue.setSelection(1);
+        }
     }
 
     private void showClimateStyle(){
-        spinnerSymbol.setEnabled(true);
-        spinnerSymbol.setSelection(condition.getCompareSymbol().ordinal());
-
-//        spinnerTriggerStyle.setEnabled(true);
-//        spinnerTriggerStyle.setSelection(condition.getTriggerStyle().ordinal());
-
         tabrowTriggerValueSpinner.setVisibility(View.GONE);
         tabrowTriggerValueEdit.setVisibility(View.VISIBLE);
 
-        editValue.setText(String.valueOf(condition.getCompareValue()));
+        editValue.setText(effect.getEffectContent());
     }
-
-    /**
-     * 方式选择事件，ADD/OR
-     */
-    private AdapterView.OnItemSelectedListener styleOnItemSelectedListener = new AdapterView.OnItemSelectedListener() {
-        @Override
-        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-            if(null == condition){
-                return;
-            }
-            if(position == 0){
-                condition.setLogic(ZLogic.AND);
-            }else{
-                condition.setLogic(ZLogic.OR);
-            }
-        }
-
-        @Override
-        public void onNothingSelected(AdapterView<?> parent) {
-
-        }
-    };
 
     /**
      * 设备选择事件，ADD/OR
@@ -207,11 +145,11 @@ public class ConditionActivity extends AppCompatActivity {
     private AdapterView.OnItemSelectedListener deviceOnItemSelectedListener = new AdapterView.OnItemSelectedListener() {
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-            if(null == condition){
+            if(null == effect){
                 return;
             }
             Device device = listDevice.get(position);
-            condition.setDevice(device);
+            effect.setDevice(device);
             if(device instanceof IStateDev){
                 showElectricalStyle();
             }else{
@@ -226,58 +164,19 @@ public class ConditionActivity extends AppCompatActivity {
     };
 
     /**
-     * 比较符号选择事件，>/</=
-     */
-    private AdapterView.OnItemSelectedListener symbolOnItemSelectedListener = new AdapterView.OnItemSelectedListener() {
-        @Override
-        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-            if(null == condition || condition.getDevice() == null){
-                return;
-            }
-            condition.setCompareSymbol(CompareSymbol.values()[position]);
-//            if(position == 0){
-//                condition.setCompareSymbol(CompareSymbol.GREAT);
-//            }else if(position == 1){
-//                condition.setCompareSymbol(CompareSymbol.EQUAL);
-//            }else {
-//                condition.setCompareSymbol(CompareSymbol.LESS);
-//            }
-        }
-
-        @Override
-        public void onNothingSelected(AdapterView<?> parent) {
-
-        }
-    };
-
-    /**
-     * 触发类型选择
-     */
-//    private AdapterView.OnItemSelectedListener triggerStyleOnItemSelectedListener = new AdapterView.OnItemSelectedListener() {
-//        @Override
-//        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//            if(null == condition || condition.getDevice() == null){
-//                return;
-//            }
-//            condition.setTriggerStyle(TriggerStyle.values()[position]);
-//        }
-//
-//        @Override
-//        public void onNothingSelected(AdapterView<?> parent) {
-//
-//        }
-//    };
-
-    /**
      * 值选择事件，ADD/OR
      */
     private AdapterView.OnItemSelectedListener valueOnItemSelectedListener = new AdapterView.OnItemSelectedListener() {
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-            if(null == condition || condition.getDevice() == null){
+            if(null == effect || effect.getDevice() == null){
                 return;
             }
-            condition.setCompareValue(position);
+            if(position == 0) {
+                effect.setDsId(DevStateHelper.DS_GUAN);
+            }else{
+                effect.setDsId(DevStateHelper.DS_KAI);
+            }
         }
 
         @Override
@@ -291,18 +190,18 @@ public class ConditionActivity extends AppCompatActivity {
         public void onClick(View v) {
             switch (v.getId()){
                 case R.id.btn_save:
-                    if(condition.getDevice() != null){
+                    if(effect.getDevice() != null){
                         try {
-                            if(condition.getDevice() instanceof IValueDevice) {
-                                condition.setCompareValue(Float.parseFloat(editValue.getText().toString()));
+                            if(effect.getDevice() instanceof IValueDevice) {
+                                effect.setEffectContent(editValue.getText().toString());
                             }
                             if(ADD){
                                 if(null != handler){
-                                    handler.obtainMessage(ADD_CONDITION, condition).sendToTarget();
+                                    handler.obtainMessage(ADD_EFFECT, effect).sendToTarget();
                                 }
                             }else{
                                 if(null != handler){
-                                    handler.obtainMessage(UPDATE_CONDITION, condition).sendToTarget();
+                                    handler.obtainMessage(UPDATE_EFFECT, effect).sendToTarget();
                                 }
                             }
                         }catch (Exception e){
@@ -319,5 +218,4 @@ public class ConditionActivity extends AppCompatActivity {
             }
         }
     };
-
 }
